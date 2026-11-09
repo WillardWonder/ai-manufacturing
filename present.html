@@ -12,8 +12,8 @@
 --head:"Barlow Condensed","Arial Narrow",sans-serif;--sans:"Barlow",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--sans);-webkit-font-smoothing:antialiased}
-.stage{position:fixed;inset:0;display:grid;place-items:center}
-.deck{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none}
+.stage{position:fixed;inset:0;overflow:hidden}
+.deck{width:1920px;height:1080px;position:absolute;left:50%;top:50%;transform-origin:center center}
 .slide{position:absolute;inset:0;display:none;padding:110px 140px;overflow:hidden;background:var(--steel);color:var(--black)}
 .slide.on{display:flex;flex-direction:column;animation:in .35s ease}
 @keyframes in{from{opacity:0}to{opacity:1}}
@@ -377,7 +377,7 @@ SAFETY 2. Slide to bottom dead center.
 (function(){
 "use strict";
 var deck=document.getElementById("deck"),slides=[].slice.call(deck.querySelectorAll(".slide")),n=slides.length,i=0;
-function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);deck.style.transform="scale("+s+")"}
+function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);deck.style.transform="translate(-50%,-50%) scale("+s+")"}
 function go(k,push){i=Math.max(0,Math.min(n-1,k));slides.forEach(function(s,j){s.classList.toggle("on",j===i)});
   document.getElementById("bar").style.width=((i+1)/n*100)+"%";document.getElementById("ct").textContent=(i+1)+" / "+n;
   if(push!==false)history.replaceState(null,"","#"+(i+1))}
