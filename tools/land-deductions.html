@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Land Deductions Evaluator</title>
+<meta content="Evaluate land value deductions for easements, wetlands, floodplain, soils, slope, access and title issues. Map the affected acres, count each acre once, and support every percentage with market evidence. Works offline." name="description"/>
+<style>
+
+    :root{
+      --bg:#0b0d08; --bg2:#13170f; --panel:rgba(255,255,255,.075); --panel2:rgba(255,255,255,.12);
+      --line:rgba(255,255,255,.16); --text:#fff7e8; --muted:#cbbfa8; --gold:#d49a3d; --green:#789d58;
+      --cream:#f0d49a; --red:#c4564b; --shadow:0 24px 80px rgba(0,0,0,.42); --max:1180px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 18% 4%,rgba(212,154,61,.24),transparent 32%),radial-gradient(circle at 90% 10%,rgba(120,157,88,.22),transparent 34%),linear-gradient(135deg,#080a07,#151810 48%,#070806);min-height:100vh} a{color:inherit;text-decoration:none}
+    .grain{position:fixed;inset:0;pointer-events:none;opacity:.14;background-image:linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(to bottom,black,transparent 92%);z-index:-1}
+    .top{position:sticky;top:0;z-index:20;background:rgba(8,10,7,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)} .nav{max-width:var(--max);margin:auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:12px}.mark{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font-weight:950;color:#11160d;background:linear-gradient(135deg,#f4c778,#bd7932 48%,#7ea75f);box-shadow:0 14px 34px rgba(212,154,61,.22)}.brand strong{display:block;letter-spacing:-.03em}.brand span span{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}.links{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.links a,.tiny{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.055);padding:9px 12px;border-radius:999px;color:#f6eddb;font-size:.88rem}.links a:hover,.tiny:hover{background:rgba(255,255,255,.12)}
+    .hero{max-width:var(--max);margin:auto;padding:72px 22px 36px;display:grid;grid-template-columns:1.03fr .97fr;gap:34px;align-items:center}.eyebrow{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(212,154,61,.35);background:rgba(212,154,61,.11);padding:8px 12px;border-radius:999px;color:#ffe7bd;font-weight:800;font-size:.9rem;margin-bottom:20px}.dot{width:9px;height:9px;border-radius:50%;background:#92d579;box-shadow:0 0 0 8px rgba(146,213,121,.12)}h1{font-size:clamp(2.55rem,6.1vw,5.7rem);line-height:.9;letter-spacing:-.075em;margin:0}h1 span{display:block;color:transparent;background:linear-gradient(90deg,#fff6df,#e7b45c 50%,#a6cf83);-webkit-background-clip:text;background-clip:text}.lead{font-size:clamp(1.04rem,1.55vw,1.25rem);line-height:1.62;color:#e0d3bc;max-width:760px;margin:24px 0 0}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 17px;border-radius:15px;font-weight:900;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.075);box-shadow:0 14px 32px rgba(0,0,0,.24)}.btn.primary{background:linear-gradient(135deg,#e4a54b,#995f22);color:#161208;border:0}.btn.green{background:linear-gradient(135deg,#9aca75,#53773d);color:#071006;border:0}.btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+    .heroCard{min-height:480px;border-radius:34px;overflow:hidden;position:relative;border:1px solid rgba(255,255,255,.17);box-shadow:var(--shadow);background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.035)),radial-gradient(circle at 35% 16%,rgba(212,154,61,.28),transparent 38%),radial-gradient(circle at 74% 34%,rgba(120,157,88,.22),transparent 40%),linear-gradient(135deg,#171d13,#090b08)}.heroCard:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(158deg,rgba(240,212,154,.14) 0 2px,transparent 2px 20px),linear-gradient(0deg,rgba(0,0,0,.6),transparent 55%)}.orb{position:absolute;right:-90px;top:-80px;width:400px;height:400px;border-radius:50%;background:repeating-radial-gradient(circle,rgba(240,212,154,.26) 0 2px,transparent 2px 31px);opacity:.55}.stack{position:absolute;left:28px;right:28px;bottom:28px;display:grid;gap:14px}.mini{padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.36);backdrop-filter:blur(12px)}.mini .k{font-size:.75rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cream);font-weight:950;margin-bottom:8px}.mini strong{display:block;margin-bottom:5px}.mini p{margin:0;color:var(--muted);line-height:1.45;font-size:.93rem}
+    .stats{max-width:var(--max);margin:auto;padding:0 22px 38px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.065);border-radius:18px;padding:18px}.stat strong{display:block;font-size:1.55rem;letter-spacing:-.04em;color:#fff2d6}.stat span{display:block;color:var(--muted);font-size:.91rem;margin-top:4px}
+    section{max-width:var(--max);margin:auto;padding:42px 22px}.sectionHead{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:22px}h2{font-size:clamp(2rem,3.4vw,3.25rem);line-height:.96;letter-spacing:-.05em;margin:0}.sectionHead p{margin:0;color:var(--muted);line-height:1.55;max-width:500px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.075);border-radius:24px;padding:22px;box-shadow:0 18px 56px rgba(0,0,0,.18)}.card:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 0%,rgba(212,154,61,.14),transparent 34%);pointer-events:none}.card>*{position:relative;z-index:1}.icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:rgba(212,154,61,.13);border:1px solid rgba(212,154,61,.28);font-size:1.35rem;margin-bottom:15px}.card h3{margin:0 0 9px;font-size:1.2rem;letter-spacing:-.02em}.card p{margin:0 0 17px;color:var(--muted);line-height:1.55}.audio-player{display:block;width:100%;margin:2px 0 13px}.demo-actions{display:flex;gap:9px;flex-wrap:wrap}.res{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);font-size:.9rem;font-weight:900}.res:hover{background:rgba(255,255,255,.14)}
+    .split{display:grid;grid-template-columns:.86fr 1.14fr;gap:16px}.notice{padding:20px;border-radius:22px;background:rgba(212,154,61,.10);border:1px solid rgba(212,154,61,.25);line-height:1.55;color:#f6e6c8}.notice strong{color:#fff3d8}.toolList{display:grid;gap:12px}.tool{display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:15px;border-radius:18px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07)}.tool:hover{background:rgba(255,255,255,.115);transform:translateY(-1px)}.badge{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(120,157,88,.17);border:1px solid rgba(120,157,88,.32);font-size:1.28rem}.tool h3{margin:0 0 4px}.tool p{margin:0;color:var(--muted);font-size:.91rem;line-height:1.45}.pill{display:inline-flex;align-items:center;padding:7px 9px;border-radius:999px;background:rgba(212,154,61,.12);border:1px solid rgba(212,154,61,.24);color:#fff0d3;font-weight:900;font-size:.78rem;white-space:nowrap}
+    .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;counter-reset:step}.step{counter-increment:step;min-height:190px;border-radius:22px;padding:18px;border:1px solid rgba(255,255,255,.13);background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.045))}.step:before{content:"0" counter(step);display:inline-flex;padding:5px 9px;border-radius:999px;background:var(--cream);color:#17130b;font-weight:950;margin-bottom:14px}.step h3{font-size:1rem;margin:0 0 8px}.step p{font-size:.92rem;color:var(--muted);line-height:1.48;margin:0}.newsGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.news{display:block;border:1px solid rgba(196,86,75,.28);background:linear-gradient(135deg,rgba(196,86,75,.14),rgba(255,255,255,.055));border-radius:22px;padding:20px;transition:transform .15s ease, background .15s ease, border-color .15s ease}.news:hover{transform:translateY(-2px);background:linear-gradient(135deg,rgba(196,86,75,.22),rgba(255,255,255,.075));border-color:rgba(255,208,201,.42)}.tag{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:#ffd0c9;font-weight:950;margin-bottom:12px}.news h3{margin:0 0 8px}.news p{margin:0 0 12px;color:var(--muted);line-height:1.5}.lesson{font-weight:900;color:#fff1d5}.source{margin-top:12px;display:inline-flex;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);color:#ffe4bd;font-size:.82rem;font-weight:900}.govGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.gov{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.07);border-radius:22px;padding:19px}.gov strong{display:block;margin-bottom:9px}.gov span{display:block;color:var(--muted);line-height:1.5;font-size:.91rem}.searchbox{width:min(420px,100%);padding:13px 15px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:var(--text);font-size:1rem}.hide{display:none!important}.foot{margin-top:36px;padding:36px 22px;border-top:1px solid var(--line);background:rgba(0,0,0,.28)}.footInner{max-width:var(--max);margin:auto;display:grid;grid-template-columns:1fr auto;gap:22px;align-items:center}.small{font-size:.88rem;color:var(--muted);line-height:1.55}.foot p{margin:6px 0 0;color:var(--muted)}
+    .gptGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.gptCard{position:relative;overflow:hidden;border:1px solid rgba(120,157,88,.32);background:linear-gradient(135deg,rgba(120,157,88,.16),rgba(255,255,255,.065));border-radius:24px;padding:24px;box-shadow:0 20px 58px rgba(0,0,0,.22)}.gptCard h3{margin:0 0 10px;font-size:1.35rem}.gptCard p{margin:0 0 16px;color:var(--muted);line-height:1.55}.gptActions{display:flex;gap:10px;flex-wrap:wrap}.activity{border:1px solid rgba(212,154,61,.26);background:rgba(212,154,61,.10);border-radius:24px;padding:22px;margin-top:16px}.activity h3{margin:0 0 10px}.activity ol,.activity ul{color:var(--muted);line-height:1.55}.accessNote{display:block;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.065);border-radius:18px;padding:16px;margin-top:14px;color:#f3e4cb}.accessNote:hover{background:rgba(255,255,255,.11)}
+    .navtoggle{display:none;border:1px solid var(--line);background:rgba(255,255,255,.06);color:#f6eddb;border-radius:12px;padding:9px 13px;font-family:inherit;font-size:.9rem;font-weight:800;cursor:pointer}
+    @media(max-width:960px){.hero,.split{grid-template-columns:1fr}.stats,.cards,.flow,.govGrid,.newsGrid,.gptGrid{grid-template-columns:repeat(2,1fr)}.heroCard{min-height:390px}.sectionHead{align-items:start;flex-direction:column}}@media(max-width:650px){.navtoggle{display:block}.links{display:none;width:100%;flex-direction:column;align-items:stretch;margin-top:12px}.links.open{display:flex}.nav{flex-wrap:wrap}.nav{align-items:flex-start;flex-direction:column}.stats,.cards,.flow,.govGrid,.newsGrid,.gptGrid{grid-template-columns:1fr}.tool{grid-template-columns:46px 1fr}.tool .pill{grid-column:1/-1;justify-content:center}.footInner{grid-template-columns:1fr}}
+  
+
+    /* ---- prompts ---- */
+    .prompt{white-space:pre-wrap;background:#11170e;border:1px solid rgba(255,255,255,.16);border-radius:16px;padding:14px;color:#fff2d8;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.92rem;line-height:1.5;margin:0}
+    .pwrap{margin-top:12px}.phead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}
+    .plabel,.lbl{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cream);font-weight:950}
+    .copy{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#f6eddb;padding:7px 11px;border-radius:999px;font-size:.76rem;font-weight:900;letter-spacing:.05em;cursor:pointer;font-family:inherit}.copy:hover{background:rgba(255,255,255,.13)}.copy.ok{background:linear-gradient(135deg,#9aca75,#53773d);color:#071006;border-color:transparent}
+
+    /* ---- tools ---- */
+    .builder{display:grid;grid-template-columns:1.08fr .92fr;gap:16px;align-items:start}
+    .panel{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.075);border-radius:24px;padding:22px;box-shadow:0 18px 56px rgba(0,0,0,.18)}
+    .panel h3{margin:0 0 6px;font-size:1.2rem;letter-spacing:-.02em}.panel .hint{margin:0 0 16px;color:var(--muted);line-height:1.5;font-size:.93rem}
+    .field{display:grid;gap:6px;margin-bottom:13px}
+    .in,textarea.in,select.in{width:100%;padding:11px 13px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.3);color:var(--text);font:inherit;font-size:.95rem}
+    textarea.in{min-height:70px;resize:vertical;line-height:1.45}.in:focus{outline:2px solid rgba(212,154,61,.6);outline-offset:1px}
+    .in::placeholder{color:rgba(203,191,168,.6)}
+    .rowsHead{display:flex;justify-content:space-between;align-items:center;margin:18px 0 8px}
+    .r3{display:grid;grid-template-columns:1.4fr 1fr 1fr 34px;gap:8px;margin-bottom:8px;align-items:start}
+    .r4{display:grid;grid-template-columns:1.1fr 1fr 1fr auto 34px;gap:8px;margin-bottom:8px;align-items:center}
+    .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.r3b{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px}
+    @media(min-width:961px){.builder>.panel:last-child{position:sticky;top:92px;max-height:calc(100vh - 110px);overflow:auto}}
+    .x{width:34px;height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:var(--muted);cursor:pointer;font:inherit;font-size:1.05rem}.x:hover{background:rgba(196,86,75,.25);color:#fff}
+    .chk{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.82rem;font-weight:800;white-space:nowrap;cursor:pointer}.chk input{width:16px;height:16px;accent-color:#789d58}
+    .mini-btn{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#f6eddb;padding:9px 12px;border-radius:12px;font:inherit;font-size:.86rem;font-weight:900;cursor:pointer}.mini-btn:hover{background:rgba(255,255,255,.14)}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    .status{border-radius:16px;padding:14px 16px;line-height:1.5;font-size:.95rem;margin-bottom:12px;border:1px solid}
+    .status strong{display:block;font-size:1.05rem;letter-spacing:-.01em;margin-bottom:3px}
+    .status.ok{background:rgba(120,157,88,.18);border-color:rgba(154,202,117,.55);color:#e4f5d6}
+    .status.no{background:rgba(196,86,75,.16);border-color:rgba(196,86,75,.5);color:#ffd9d3}
+    .status.wait{background:rgba(212,154,61,.12);border-color:rgba(212,154,61,.4);color:#ffe7bd}
+    .warns{margin:0 0 12px;padding-left:18px;color:#ffd9b0;line-height:1.5;font-size:.9rem}
+    .item{border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.18);border-radius:16px;padding:12px;margin-bottom:10px}
+    .item.pass{border-color:rgba(154,202,117,.5)}.item.fail{border-color:rgba(196,86,75,.55)}
+    .itemTop{display:grid;grid-template-columns:28px 1fr 34px;gap:8px;align-items:start}
+    .num{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--cream);color:#17130b;font-weight:950;font-size:.85rem;margin-top:7px}
+    .seg{display:inline-flex;border:1px solid rgba(255,255,255,.14);border-radius:12px;overflow:hidden;margin-top:9px}
+    .seg button{border:0;background:rgba(255,255,255,.05);color:var(--muted);padding:8px 14px;font:inherit;font-size:.84rem;font-weight:900;cursor:pointer}
+    .seg button+button{border-left:1px solid rgba(255,255,255,.14)}
+    .seg button.on.p{background:linear-gradient(135deg,#9aca75,#53773d);color:#071006}.seg button.on.f{background:linear-gradient(135deg,#d77064,#8f3a31);color:#fff}
+    .lint{margin:8px 0 0 36px;color:#ffd9b0;font-size:.84rem;line-height:1.45}
+    .itemFoot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-left:36px}
+    .reg{display:grid;gap:8px;margin-top:10px}
+    .regRow{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.2)}
+    .regRow b{display:block}.regRow span{color:var(--muted);font-size:.84rem}
+    .dotS{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;background:#c4564b}.dotS.ok{background:#92d579}
+    .chain{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;counter-reset:step}
+    .loop{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+    .loop div{border:1px dashed rgba(196,86,75,.45);background:rgba(196,86,75,.08);border-radius:18px;padding:14px;font-size:.92rem;line-height:1.45;color:#f3dcd6}
+    .loop div b{display:block;color:#fff;margin-bottom:4px}
+    .pvRule{border-left:3px solid var(--gold);padding:4px 0 4px 14px;margin:12px 0 0;color:#f6e6c8;line-height:1.5}
+    .anchorNote{font-size:.85rem;color:var(--muted);margin-top:10px;line-height:1.5}
+    @media(max-width:960px){.builder,.chain,.loop{grid-template-columns:1fr}.r3,.r4{grid-template-columns:1fr 1fr}.r3 .x,.r4 .x{grid-column:auto}}
+    @media(max-width:650px){.r2,.r3,.r3b,.r4{grid-template-columns:1fr}}
+    @media print{
+      .top,.grain,.toolbar,.copy,.x,.mini-btn,.actions,.navtoggle{display:none!important}
+      body{background:#fff!important;color:#000}
+      .panel,.card,.gov,.step,.item{break-inside:avoid;background:#fff!important;color:#000;border-color:#999!important;box-shadow:none}
+      .in{border-color:#999;color:#000;background:#fff}
+      body.print-one main>section:not(.printing),body.print-one .hero,body.print-one .stats,body.print-one .foot{display:none!important}
+      body.print-one .printing .builder{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+
+    /* ---- deductions evaluator ---- */
+    :root{--g-water:#3987e5;--g-ease:#d95926;--g-env:#199e70;--g-terrain:#c98500;--g-clear:#4a4d42;--g-whole:#9085e9}
+    .topo{position:absolute;inset:0;width:100%;height:100%;opacity:.55}
+    .topo path{fill:none;stroke:rgba(240,212,154,.28);stroke-width:1.2}
+    .topo path.hi{stroke:rgba(166,207,131,.45)}
+    @media(prefers-reduced-motion:no-preference){.topo g{animation:drift 38s ease-in-out infinite alternate}@keyframes drift{from{transform:translate(0,0) rotate(0)}to{transform:translate(-14px,10px) rotate(1.4deg)}}}
+    .stamp{position:absolute;left:28px;top:26px;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--cream);font-weight:950;border:1px solid rgba(240,212,154,.45);padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.35)}
+    .ruleflow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;counter-reset:step}
+    .ev{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;align-items:start}
+    @media(min-width:1101px){.evRight{position:sticky;top:88px;max-height:calc(100vh - 100px);overflow:auto}}
+    .fpick{display:flex;flex-wrap:wrap;gap:7px;margin:4px 0 14px}
+    .fchip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#f6eddb;border-radius:999px;padding:7px 11px;font:inherit;font-size:.82rem;font-weight:800;cursor:pointer}
+    .fchip:hover{background:rgba(255,255,255,.12)}.fchip.on{background:rgba(212,154,61,.18);border-color:rgba(212,154,61,.6)}
+    .fchip i{width:9px;height:9px;border-radius:3px;display:inline-block}
+    .fcard{border:1px solid rgba(255,255,255,.13);background:rgba(0,0,0,.2);border-radius:18px;padding:14px;margin-bottom:12px;border-left:4px solid var(--c)}
+    .fcard.bad{border-color:rgba(196,86,75,.55);border-left-color:var(--c)}
+    .fhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+    .fhead b{font-size:1.02rem}.fhead small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+    .fgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .fgrid .field{margin-bottom:6px}
+    .helper{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin:2px 0 8px;padding:10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.14)}
+    .helper .lbl{font-size:.66rem}
+    .tipline{font-size:.83rem;color:#ffd9b0;line-height:1.45;margin-top:4px}
+    .okline{font-size:.83rem;color:#cfe8bf;line-height:1.45;margin-top:4px}
+    .big{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    .bigN{border:1px solid rgba(255,255,255,.13);background:rgba(0,0,0,.22);border-radius:16px;padding:14px}
+    .bigN span{display:block;color:var(--muted);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;font-weight:900}
+    .bigN strong{display:block;font-size:1.45rem;letter-spacing:-.03em;color:#fff2d6;margin-top:4px;font-variant-numeric:tabular-nums}
+    .bigN em{display:block;font-style:normal;color:var(--muted);font-size:.82rem;margin-top:2px}
+    .vizHead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:14px 0 8px}
+    .vizHead h4{margin:0;font-size:.95rem}.vizHead span{color:var(--muted);font-size:.8rem}
+    .waffle{display:grid;grid-template-columns:repeat(20,1fr);gap:2px;padding:10px;border-radius:14px;background:rgba(0,0,0,.25)}
+    .cell{aspect-ratio:1;border-radius:3px;background:var(--g-clear);transition:background .35s ease,transform .15s ease}
+    .cell:hover{transform:scale(1.25);outline:2px solid #fff2d6;z-index:2;position:relative}
+    .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:.82rem;color:#e7dcc6}
+    .legend span{display:inline-flex;align-items:center;gap:6px}.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+    .wf{display:grid;gap:6px;margin-top:4px}
+    .wfRow{display:grid;grid-template-columns:150px 1fr 96px;gap:10px;align-items:center;font-size:.84rem;cursor:default}
+    .wfRow .nm{color:#e7dcc6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .wfRow .val{text-align:right;font-variant-numeric:tabular-nums;color:#fff2d6}
+    .track{position:relative;height:18px;border-radius:4px;background:rgba(255,255,255,.04)}
+    .bar{position:absolute;top:0;bottom:0;border-radius:4px;transition:left .45s ease,width .45s ease}
+    .whisk{position:absolute;top:50%;height:2px;background:#fff2d6;transform:translateY(-50%)}
+    .whisk:before,.whisk:after{content:"";position:absolute;top:-5px;width:2px;height:12px;background:#fff2d6}.whisk:before{left:0}.whisk:after{right:0}
+    .wfRow.total .nm{font-weight:900;color:#fff2d6}
+    .tip{position:fixed;z-index:60;pointer-events:none;background:#0d100b;border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 10px;font-size:.82rem;line-height:1.4;color:#fff2d6;box-shadow:0 12px 30px rgba(0,0,0,.45);max-width:260px;display:none}
+    .tip b{display:block}
+    .evid{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;font-size:.74rem;font-weight:900;border:1px solid}
+    .evid.ok{background:rgba(120,157,88,.18);border-color:rgba(154,202,117,.5);color:#e4f5d6}
+    .evid.meh{background:rgba(212,154,61,.14);border-color:rgba(212,154,61,.45);color:#ffe7bd}
+    .evid.no{background:rgba(196,86,75,.16);border-color:rgba(196,86,75,.5);color:#ffd9d3}
+    .guide{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .gcard{border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.065);border-radius:22px;padding:18px;border-top:4px solid var(--c)}
+    .gcard h3{margin:0 0 4px;font-size:1.12rem}.gcard .kind{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--cream);font-weight:900}
+    .gcard dl{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;margin:10px 0 0;font-size:.88rem;line-height:1.45}
+    .gcard dt{color:var(--cream);font-weight:900;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;padding-top:2px}
+    .gcard dd{margin:0;color:#e0d3bc}.gcard dd a{text-decoration:underline}
+    .demoNote{font-size:.8rem;color:#ffd9b0;margin:-4px 0 12px}
+    @media(max-width:1100px){.ev{grid-template-columns:1fr}.ruleflow{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:760px){.guide{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr 1fr}.wfRow{grid-template-columns:100px 1fr 78px}.waffle{grid-template-columns:repeat(10,1fr)}.big{grid-template-columns:1fr}}
+    @media(max-width:650px){.ruleflow{grid-template-columns:1fr}.helper{grid-template-columns:1fr 1fr}}
+    @media print{.fpick,.evActions,.tip{display:none!important}.ev{grid-template-columns:1fr}.fcard,.gcard,.bigN{break-inside:avoid;background:#fff!important;color:#000}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="tip" id="tip" role="tooltip"></div>
+<header class="top"><nav aria-label="Main navigation" class="nav"><a class="brand" href="#top"><span class="mark">AI</span><span><strong>Land Deductions Evaluator</strong><span>Example tool · Built with AI</span></span></a><button aria-controls="navlinks" aria-expanded="false" class="navtoggle">Menu</button><div class="links" id="navlinks"><a href="#rules5">The five rules</a><a href="#evaluator">Evaluator</a><a href="#guide">Field guide</a><a href="#ded-prompts">Prompts</a><a href="../index.html#built">Back to AI for Manufacturers</a></div></nav></header>
+<main id="top">
+<section class="hero">
+<div>
+<div class="eyebrow"><span class="dot"></span> Valuation · Works offline</div>
+<h1>Every deduction <span>needs a map and a market.</span></h1>
+<p class="lead">Easements, wetlands, floodplain, poor soils, steep ground, no access. Each can take value off a parcel, but only on the acres it touches, only once, and only by an amount the market supports. This tool walks you through it and shows where the value goes.</p>
+<div class="actions"><a class="btn primary" href="#evaluator">Open the evaluator</a><button class="btn green" id="heroExample" type="button">Load the training example</button><a class="btn" href="#guide">Read the field guide</a></div>
+</div>
+<aside aria-label="Parcel illustration" class="heroCard"><svg aria-hidden="true" class="topo" id="topo" preserveAspectRatio="xMidYMid slice" viewBox="0 0 600 480"></svg><span class="stamp">Parcel · T31N R11E</span><div class="stack"><div class="mini"><div class="k">The rule of thumb</div><strong>Deduct the land, not the guess.</strong><p>A percentage with no paired sales behind it is an opinion. Label it, or go find the evidence.</p></div><div class="mini"><div class="k">Live result</div><strong id="heroLive">Load the example to see value move.</strong><p id="heroLiveSub">Indicative only. Not an appraisal.</p></div></div></aside>
+</section>
+
+<section id="rules5"><div class="sectionHead"><h2>The five rules.</h2><p>How appraisers and careful buyers keep deductions honest. The evaluator enforces all five.</p></div>
+<div class="ruleflow">
+<div class="step"><h3>Start unencumbered</h3><p>Begin from the value of similar land without the problem, taken from comparable sales. Write down where that number came from.</p></div>
+<div class="step"><h3>Map the acres</h3><p>Measure the affected area from a map, survey or recorded document. A strip easement is width × length ÷ 43,560.</p></div>
+<div class="step"><h3>Deduct where it hits</h3><p>Apply the discount to the affected acres only, unless the condition truly affects the whole parcel (no access, conservation easement).</p></div>
+<div class="step"><h3>Count every acre once</h3><p>A wetland inside a powerline corridor is one deduction, under the more severe of the two. Soils already priced through timber value are not deducted again.</p></div>
+<div class="step"><h3>Prove the percentage</h3><p>Support each percentage with paired sales or a documented market study. Otherwise label it as judgment and get sign-off.</p></div>
+</div>
+</section>
+
+<section id="evaluator"><div class="sectionHead"><h2>The evaluator.</h2><p>Enter the parcel, add the conditions that apply, and give each one its acres, a low–high impact range and its evidence. Everything is calculated in this page; nothing is sent anywhere.</p></div>
+<div class="ev">
+<div class="panel">
+<h3>1 · The parcel</h3><p class="hint">Use the unencumbered value of comparable land, not the asking price or assessed value.</p>
+<p class="demoNote" id="demoNote" hidden>Training example: the numbers are illustrative, not market data.</p>
+<div class="r2"><div class="field"><span class="lbl">Parcel name or ID</span><input class="in" id="pName" placeholder="e.g. 026-0582, Town of Rolling"/></div><div class="field"><span class="lbl">Total acres</span><input class="in" id="pAcres" inputmode="decimal" min="0" placeholder="e.g. 80" step="any" type="number"/></div></div>
+<div class="r2"><div class="field"><span class="lbl">Unencumbered value ($ per acre)</span><input class="in" id="pRate" inputmode="decimal" min="0" placeholder="From comparable sales" step="any" type="number"/></div><div class="field"><span class="lbl">Where that value came from</span><input class="in" id="pSource" placeholder="e.g. Parcel Scout comps median, 12 sales within 30 mi"/></div></div>
+<div class="tipline" id="pWarn"></div>
+<h3 style="margin-top:14px">2 · The conditions</h3><p class="hint">Tap a condition to add it. Assign each acre to one condition only.</p>
+<div class="fpick" id="fpick"></div>
+<div id="fcards"></div>
+<div class="toolbar evActions"><button class="mini-btn" id="exBtn" type="button">Load training example</button><button class="mini-btn" id="saveBtn" type="button">Download file</button><label class="mini-btn" style="display:inline-flex;align-items:center">Open file<input accept=".json,application/json" hidden id="openBtn" type="file"/></label><button class="mini-btn" id="clearBtn" type="button">Clear</button></div>
+</div>
+<div class="panel evRight" id="results">
+<h3>3 · The result</h3><p class="hint">Indicative adjusted value. Not an appraisal: a person signs off before any figure reaches a landowner or an offer.</p>
+<div id="status"></div>
+<div class="big"><div class="bigN"><span>Unencumbered</span><strong id="nGross">—</strong><em id="nGrossSub">acres × $ per acre</em></div><div class="bigN"><span>Indicative adjusted</span><strong id="nAdj">—</strong><em id="nAdjSub">low – high</em></div><div class="bigN"><span>Total deduction</span><strong id="nDed">—</strong><em id="nDedSub">—</em></div><div class="bigN"><span>Evidence</span><strong id="nEv">—</strong><em id="nEvSub">adjustments supported by market evidence</em></div></div>
+<ul class="warns" id="warns"></ul>
+<div class="vizHead"><h4>Where the acres are</h4><span id="waffleNote">each square ≈ 1% of the parcel</span></div>
+<div aria-label="Acre map: share of the parcel under each condition" class="waffle" id="waffle" role="img"></div>
+<div class="legend" id="legend"></div>
+<div class="vizHead"><h4>Where the value goes</h4><span>midpoint shown · whisker = low–high</span></div>
+<div class="wf" id="wf"></div>
+<div class="pwrap"><div class="phead"><span class="plabel">Summary for the file or ChatGPT</span><button class="copy" data-copy="sumOut" type="button">Copy</button></div><pre class="prompt" id="sumOut" style="max-height:240px;overflow:auto"></pre></div>
+<div class="toolbar evActions"><button class="mini-btn" id="printBtn" type="button">Print</button></div>
+</div>
+</div>
+</section>
+
+<section id="guide"><div class="sectionHead"><h2>Field guide.</h2><p>What each condition does to value, how to measure it, where to look in Wisconsin, and how it gets counted twice by mistake.</p></div>
+<div class="guide" id="guideList"></div>
+</section>
+
+<section id="ded-prompts"><div class="sectionHead"><h2>Prompts for deduction work.</h2><p>Use AI to read documents and organize evidence. Not to invent the percentage.</p></div>
+<div class="cards" style="grid-template-columns:repeat(3,1fr)">
+<article class="card"><div class="icon">📄</div><h3>Read an easement document</h3><div class="pwrap"><div class="phead"><span class="plabel">Prompt</span><button class="copy" type="button">Copy</button></div><pre class="prompt">Here is the text of a recorded easement: [paste].
+List: who holds it; its width and location; what the holder may do; what the landowner may still do; whether trees may grow in it; whether it can be relocated; whether it runs with the land.
+Quote the clause that answers each item. If the document does not say, write "Not stated". Do not estimate any value.</pre></div></article>
+<article class="card"><div class="icon">⚖️</div><h3>Paired sales for one condition</h3><div class="pwrap"><div class="phead"><span class="plabel">Prompt</span><button class="copy" type="button">Copy</button></div><pre class="prompt">Here are sales of similar parcels: [paste table: date, acres, price, location, has the condition yes/no].
+Pair sales that differ mainly by [condition]. For each pair, show the price-per-acre difference as a percentage, with the arithmetic.
+Then give the range and median across pairs. Flag pairs that also differ in size, date, access or location.
+Use only the sales I gave you. If there are too few pairs to support a percentage, say so.</pre></div></article>
+<article class="card"><div class="icon">🔁</div><h3>Check for double counting</h3><div class="pwrap"><div class="phead"><span class="plabel">Prompt</span><button class="copy" type="button">Copy</button></div><pre class="prompt">Here are the deductions applied to a parcel: [paste the evaluator summary].
+Identify anything that could be counted twice: overlapping areas (e.g. wetland inside an easement), soil or productivity limits already reflected in timber value, or conditions my comparable sales already share.
+Do not change any percentage. List the questions I need to answer instead.</pre></div></article>
+</div>
+</section>
+</main>
+<footer class="foot"><div class="footInner"><div><strong>Land Deductions Evaluator</strong><p>An example tool built with AI. Indicative only; a named person signs off before any figure is used.</p></div><div class="small">Works offline once downloaded.<br/><a href="../index.html#built" style="text-decoration:underline">Back to AI for Manufacturers</a></div></div></footer>
+<script>
+(function(){
+"use strict";
+var $=function(s,r){return (r||document).querySelector(s)}, $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s))};
+var str=function(v){return v==null?"":String(v).trim()};
+var num=function(v){var n=parseFloat(v);return Number.isFinite(n)?n:null};
+function el(tag,attrs,kids){var e=document.createElement(tag);if(attrs)Object.keys(attrs).forEach(function(k){if(k==="text")e.textContent=attrs[k];else if(k==="cls")e.className=attrs[k];else if(k==="html")e.innerHTML=attrs[k];else e.setAttribute(k,attrs[k])});(kids||[]).forEach(function(c){if(c!=null&&c!==false)e.appendChild(typeof c==="string"?document.createTextNode(c):c)});return e}
+var usd=function(v){return (v<0?"−$":"$")+Math.round(Math.abs(v)).toLocaleString("en-US")};
+var usdK=function(v){var a=Math.abs(v);return (v<0?"−$":"$")+(a>=1e6?(a/1e6).toFixed(2)+"M":a>=1e4?Math.round(a/1e3)+"k":Math.round(a).toLocaleString("en-US"))};
+var ac=function(v){return (Math.round(v*100)/100).toLocaleString("en-US")+" ac"};
+var store={get:function(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set:function(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+
+var t=$(".navtoggle"),l=$("#navlinks");
+if(t&&l)t.addEventListener("click",function(){var o=l.classList.toggle("open");t.setAttribute("aria-expanded",o?"true":"false")});
+
+/* ---------- groups and factor library ---------- */
+var GROUPS={water:{n:"Water",c:"var(--g-water)",hex:"#3987e5"},ease:{n:"Easements & access",c:"var(--g-ease)",hex:"#d95926"},env:{n:"Environmental",c:"var(--g-env)",hex:"#199e70"},terrain:{n:"Terrain & soil",c:"var(--g-terrain)",hex:"#c98500"},whole:{n:"Whole parcel",c:"var(--g-whole)",hex:"#9085e9"}};
+var A=function(href,text){return '<a href="'+href+'" target="_blank" rel="noopener noreferrer">'+text+'</a>'};
+var F=[
+ {k:"utility",icon:"⚡",n:"Utility, pipeline or powerline easement",g:"ease",scope:"area",helper:"strip",
+  what:"The holder can build, clear and maintain a corridor. Powerline and pipeline corridors are usually kept clear of trees, so timber in the strip is lost and cannot regrow. Building in the strip is normally barred.",
+  measure:"Width × length from the recorded easement or a survey. Acres = width (ft) × length (ft) ÷ 43,560.",
+  where:"The recorded easement at the county Register of Deeds; the title commitment lists recorded easements.",
+  evidence:"Paired sales of similar parcels with and without a corridor. The impact depends on the rights granted: surface use, tree clearing, access, future lines.",
+  watch:"If timber value is figured separately and already excludes the cleared strip, do not deduct the strip's timber again."},
+ {k:"access_ease",icon:"🛣️",n:"Access easement crossing the parcel",g:"ease",scope:"area",helper:"strip",
+  what:"Someone else has the right to cross. The road strip loses use, and traffic can affect privacy and hunting value nearby.",
+  measure:"Road width × length ÷ 43,560, from the easement or survey.",
+  where:"Register of Deeds; title commitment; plat or certified survey map.",
+  evidence:"Paired sales; the easement terms (exclusive or shared, maintenance, gates).",
+  watch:"An easement that benefits this parcel (its own access) adds value. That is not a deduction."},
+ {k:"wetland",icon:"💧",n:"Wetlands",g:"water",scope:"area",
+  what:"Filling and building are regulated. Logging is often limited to frozen or dry conditions, which raises cost and limits timing. Forested wetlands can still carry timber value.",
+  measure:"Mapped wetland acres within the parcel boundary. Mapped wetlands are indicators; a field delineation is definitive.",
+  where:A("https://dnr.wisconsin.gov/topic/SurfaceWater/SWDV","WI DNR Surface Water Data Viewer")+" (Wisconsin Wetland Inventory layer); "+A("https://dnr.wisconsin.gov/topic/Wetlands/mapping.html","DNR wetland mapping")+".",
+  evidence:"Sales of parcels with a similar wetland share; harvest cost differences from logging records.",
+  watch:"Deduct the land use you lose, not automatically the timber. If timber value is figured separately, keep forested wetland timber in it at its real harvest cost."},
+ {k:"flood",icon:"🌊",n:"Floodplain",g:"water",scope:"area",
+  what:"Building is restricted or prohibited by floodplain zoning; flooding can limit access and harvest timing.",
+  measure:"Acres inside the mapped flood zone within the boundary.",
+  where:A("https://msc.fema.gov/portal/home","FEMA Flood Map Service Center")+" and county floodplain zoning maps.",
+  evidence:"Paired sales; whether the buyer's intended use (timber, hunting) is affected at all.",
+  watch:"Floodplain and wetland often overlap. Count shared acres once."},
+ {k:"shore",icon:"🏞️",n:"Shoreland setback and water frontage",g:"water",scope:"area",
+  what:"Shoreland zoning sets building setbacks and vegetation rules near lakes and streams. Frontage itself usually adds value, so this is often a premium, not a deduction.",
+  measure:"Setback strip area, or frontage in feet when frontage is the value driver.",
+  where:A("https://dnr.wisconsin.gov/topic/ShorelandZoning/Programs/program-management.html","WI DNR shoreland zoning program")+" and the county shoreland ordinance.",
+  evidence:"Sales with and without frontage. Enter a negative percentage for a premium.",
+  watch:"Do not deduct the setback and then miss the frontage premium. They come together."},
+ {k:"slope",icon:"⛰️",n:"Steep slopes and rock",g:"terrain",scope:"area",
+  what:"Steep or rocky ground limits equipment, raises harvest cost and can make building impractical.",
+  measure:"Acres in steep slope classes from the soil survey, checked on the ground.",
+  where:A("https://websoilsurvey.nrcs.usda.gov/","USDA Web Soil Survey")+" (slope classes in each map unit).",
+  evidence:"Harvest cost differences; paired sales of rough versus level ground.",
+  watch:"If harvest cost is already in the timber value, deduct only the land-use loss."},
+ {k:"soil",icon:"🧪",n:"Soil limits: acidity, drainage, low productivity",g:"terrain",scope:"area",helper:"productivity",
+  what:"Acid, poorly drained or droughty soils grow less timber and suit fewer uses. For timberland this shows up as lower site index and productivity.",
+  measure:"Acres of limiting soil map units; productivity (ft³/ac/yr) and site index for the main species.",
+  where:A("https://websoilsurvey.nrcs.usda.gov/","USDA Web Soil Survey")+" (pH, drainage class, forest productivity). Parcel Scout shows drainage and site index per map unit.",
+  evidence:"Comparable sales on similar soils; productivity compared with the soils under your comparable sales.",
+  watch:"The most common double count. If your comparable sales sit on similar soils, or timber value already uses site index, do not deduct here."},
+ {k:"contam",icon:"☣️",n:"Contamination, dumps or fill",g:"env",scope:"area",
+  what:"Cleanup cost, liability and stigma. Old dumps, tanks and spills are common on rural land.",
+  measure:"The affected area from a Phase I environmental site assessment, if one exists.",
+  where:A("https://dnr.wisconsin.gov/topic/Brownfields/botw.html","WI DNR BRRTS on the Web")+" (contaminated sites); a Phase I ESA.",
+  evidence:"Cleanup cost estimates plus stigma from sales of affected properties.",
+  watch:"If the cleanup cost is deducted in dollars, do not also deduct a percentage for the same area."},
+ {k:"landlocked",icon:"🚫",n:"No legal access (landlocked)",g:"whole",scope:"whole",
+  what:"Without recorded legal access the parcel is hard to use, finance or sell. This affects the whole parcel.",
+  measure:"Whole parcel.",
+  where:"Title commitment, plat or certified survey map, and the Register of Deeds.",
+  evidence:"Sales of landlocked parcels; the cost and time to buy access, as a reasonableness check.",
+  watch:"If all your comparable sales were also landlocked, the base value already reflects it."},
+ {k:"conservation",icon:"🌿",n:"Conservation easement",g:"whole",scope:"whole",
+  what:"Permanently removes some rights, typically development or subdivision. What remains is what is valued.",
+  measure:"Whole parcel, subject to the easement's terms.",
+  where:"The recorded conservation easement; any appraisal done when it was granted.",
+  evidence:"The easement terms and sales of similarly restricted land; a before-and-after appraisal if one exists.",
+  watch:"Timber harvest is often still allowed. Read the terms before assuming loss."},
+ {k:"minerals",icon:"⛏️",n:"Severed mineral rights",g:"whole",scope:"whole",
+  what:"Someone else owns the minerals and may have surface rights to reach them.",
+  measure:"Whole parcel.",
+  where:"Title search and the Register of Deeds.",
+  evidence:"Market reaction to severed rights in the area; often small where mining is unlikely.",
+  watch:"Usually a risk to disclose rather than a large deduction. Say which, and why."}
+];
+var FBY={};F.forEach(function(f){FBY[f.k]=f});
+var EVID=[["paired","Paired sales or market study"],["judgment","Appraiser or assessor judgment"],["none","No evidence yet"]];
+
+/* ---------- state ---------- */
+var BLANK={name:"",acres:"",rate:"",source:"",factors:[]};
+var S=store.get("k3_deductions",null);if(!S||!Array.isArray(S.factors))S=JSON.parse(JSON.stringify(BLANK));
+var EXAMPLE={demo:true,name:"Training example: 80 acres, Langlade County",acres:"80",rate:"3800",source:"Illustrative for training (in practice: Parcel Scout comps median and the sales list)",
+ factors:[{k:"utility",acres:"9.09",lo:"40",hi:"60",ev:"paired",note:"150 ft powerline corridor × 2,640 ft",w:"150",len:"2640"},
+          {k:"wetland",acres:"12",lo:"50",hi:"75",ev:"judgment",note:"Wetland Inventory; no field delineation yet"},
+          {k:"soil",acres:"6",lo:"10",hi:"20",ev:"none",note:"Poorly drained map unit",subj:"43",typ:"57"},
+          {k:"minerals",acres:"",lo:"0",hi:"2",ev:"judgment",note:"Severed in 1950s deed; no mining activity in area"}]};
+function save(){store.set("k3_deductions",S)}
+
+/* ---------- calculation (pure) ---------- */
+function calc(s){
+  var acres=num(s.acres)||0,rate=num(s.rate)||0,gross=acres*rate,warns=[],rows=[];
+  var areaAcres=0,area=s.factors.filter(function(f){return FBY[f.k]&&FBY[f.k].scope==="area"}),whole=s.factors.filter(function(f){return FBY[f.k]&&FBY[f.k].scope==="whole"});
+  var dLo=0,dHi=0,dMid=0;
+  area.forEach(function(f){
+    var a=Math.max(0,num(f.acres)||0),lo=num(f.lo),hi=num(f.hi);if(lo==null)lo=0;if(hi==null)hi=lo;if(lo>hi){var x=lo;lo=hi;hi=x}
+    areaAcres+=a;var base=a*rate;
+    var r={f:f,def:FBY[f.k],acres:a,lo:lo,hi:hi,minus:{lo:base*lo/100,hi:base*hi/100,mid:base*(lo+hi)/200}};
+    dLo+=r.minus.lo;dHi+=r.minus.hi;dMid+=r.minus.mid;rows.push(r);
+  });
+  var vHigh=gross-dLo,vLow=gross-dHi,vMid=gross-dMid;
+  whole.forEach(function(f){
+    var lo=num(f.lo),hi=num(f.hi);if(lo==null)lo=0;if(hi==null)hi=lo;if(lo>hi){var x=lo;lo=hi;hi=x}
+    var r={f:f,def:FBY[f.k],acres:acres,lo:lo,hi:hi,minus:{lo:vHigh*lo/100,hi:vLow*hi/100,mid:vMid*(lo+hi)/200}};
+    vHigh-=r.minus.lo;vLow-=r.minus.hi;vMid-=r.minus.mid;rows.push(r);
+  });
+  var adjusted=rows.filter(function(r){return r.lo!==0||r.hi!==0});
+  var supported=adjusted.filter(function(r){return r.f.ev==="paired"}).length,unsupported=adjusted.filter(function(r){return r.f.ev==="none"});
+  if(!acres||!rate)warns.push({lvl:"wait",m:"Enter total acres and the unencumbered $ per acre to see value."});
+  if(rate&&!str(s.source))warns.push({lvl:"no",m:"The unencumbered $ per acre has no source. Every deduction rests on it."});
+  if(acres&&areaAcres>acres+1e-9)warns.push({lvl:"no",m:"Affected acres ("+ac(areaAcres)+") exceed the parcel ("+ac(acres)+"). Some acres are counted under two conditions. Assign each acre to one."});
+  rows.forEach(function(r){
+    if(r.def.scope==="area"&&(r.lo||r.hi)&&!r.acres)warns.push({lvl:"no",m:r.def.n+": a percentage with no acres does nothing. Map the affected area."});
+    if(r.hi>100)warns.push({lvl:"no",m:r.def.n+": an impact above 100% takes away more than the land is worth."});
+    if((r.lo||r.hi)&&r.f.ev==="none")warns.push({lvl:"no",m:r.def.n+": no evidence for "+r.lo+"–"+r.hi+"%. Find paired sales, or record it as judgment for sign-off."});
+    if(r.f.k==="soil"&&(r.lo||r.hi))warns.push({lvl:"wait",m:"Soil limits: confirm your comparable sales were on better soils and that timber value does not already use site index. Otherwise this is a double count."});
+    if(r.f.k==="shore"&&r.lo>0)warns.push({lvl:"wait",m:"Shoreland: frontage usually adds value. Check whether this should be a premium (negative %)."});
+  });
+  var wet=s.factors.some(function(f){return f.k==="wetland"}),fl=s.factors.some(function(f){return f.k==="flood"});
+  if(wet&&fl)warns.push({lvl:"wait",m:"Wetland and floodplain often overlap. Make sure shared acres are entered under only one."});
+  var errors=warns.filter(function(w){return w.lvl==="no"}).length;
+  return {acres:acres,rate:rate,gross:gross,rows:rows,areaAcres:areaAcres,clear:Math.max(0,acres-areaAcres),
+    low:vLow,high:vHigh,mid:vMid,dedLo:gross-vHigh,dedHi:gross-vLow,adjusted:adjusted.length,supported:supported,judgment:adjusted.filter(function(r){return r.f.ev==="judgment"}).length,unsupported:unsupported.length,warns:warns,errors:errors};
+}
+
+/* ---------- factor cards ---------- */
+function renderPicker(){
+  var box=$("#fpick");box.replaceChildren();
+  F.forEach(function(f){
+    var on=S.factors.some(function(x){return x.k===f.k});
+    var b=el("button",{type:"button",cls:"fchip"+(on?" on":""),"aria-pressed":on?"true":"false"},[el("i",{style:"background:"+GROUPS[f.g].c}),f.icon+" "+f.n.split(/[,:(]/)[0]]);
+    b.addEventListener("click",function(){
+      if(on)S.factors=S.factors.filter(function(x){return x.k!==f.k});
+      else S.factors.push({k:f.k,acres:"",lo:"",hi:"",ev:"none",note:""});
+      S.demo=false;save();renderCards();update();
+      if(!on){var c=$("#fc-"+f.k);if(c){c.scrollIntoView({behavior:"smooth",block:"center"});var i=$("input",c);if(i)i.focus()}}
+    });
+    box.appendChild(b);
+  });
+}
+function inp(f,key,ph,type){var i=el("input",{cls:"in",placeholder:ph||"",type:type||"text"});if(type==="number"){i.setAttribute("inputmode","decimal");i.setAttribute("step","any")}i.value=f[key]==null?"":f[key];i.addEventListener("input",function(){f[key]=i.value;S.demo=false;save();update()});return i}
+function fld(label,input){return el("div",{cls:"field"},[el("span",{cls:"lbl",text:label}),input])}
+function renderCards(){
+  var box=$("#fcards");box.replaceChildren();
+  if(!S.factors.length){box.appendChild(el("div",{cls:"empty",style:"color:var(--muted);line-height:1.55;padding:16px;border:1px dashed rgba(255,255,255,.18);border-radius:16px",text:"No conditions added. Tap one above, or load the training example."}));renderPicker();return}
+  S.factors.forEach(function(f,idx){
+    var d=FBY[f.k];if(!d)return;
+    var rm=el("button",{cls:"x",type:"button","aria-label":"Remove "+d.n,text:"×"});rm.addEventListener("click",function(){S.factors.splice(idx,1);save();renderCards();update()});
+    var card=el("div",{cls:"fcard",id:"fc-"+f.k,style:"--c:"+GROUPS[d.g].c},[
+      el("div",{cls:"fhead"},[el("div",null,[el("b",{text:d.icon+" "+d.n}),el("small",{text:GROUPS[d.g].n+" · "+(d.scope==="whole"?"applies to the whole parcel":"applies to the affected acres")})]),rm])
+    ]);
+    if(d.helper==="strip"){
+      var w=el("input",{cls:"in",type:"number",placeholder:"Width ft"}),ln=el("input",{cls:"in",type:"number",placeholder:"Length ft"});w.value=f.w||"";ln.value=f.len||"";
+      var go=el("button",{cls:"mini-btn",type:"button",text:"= acres"});
+      go.addEventListener("click",function(){var a=(num(w.value)||0)*(num(ln.value)||0)/43560;if(!a)return;f.w=w.value;f.len=ln.value;f.acres=String(Math.round(a*100)/100);save();renderCards();update()});
+      card.appendChild(el("div",{cls:"helper"},[fld("Strip width (ft)",w),fld("Length (ft)",ln),go]));
+    }
+    var g=el("div",{cls:"fgrid"});
+    if(d.scope==="area")g.appendChild(fld("Affected acres",inp(f,"acres","e.g. 12","number")));
+    g.appendChild(fld("Impact low %",inp(f,"lo","e.g. 40","number")));
+    g.appendChild(fld("Impact high %",inp(f,"hi","e.g. 60","number")));
+    var ev=el("select",{cls:"in"});EVID.forEach(function(e){var o=el("option",{text:e[1]});o.value=e[0];if(f.ev===e[0])o.selected=true;ev.appendChild(o)});
+    ev.addEventListener("change",function(){f.ev=ev.value;S.demo=false;save();renderCards();update()});
+    card.appendChild(g);
+    card.appendChild(el("div",{cls:"r2"},[fld("Evidence",ev),fld("Note or source",inp(f,"note","Document, map, sales used"))]));
+    if(d.helper==="productivity"){
+      var sj=inp(f,"subj","Subject ft³/ac/yr","number"),ty=inp(f,"typ","Comps' soils ft³/ac/yr","number"),out=el("div",{cls:"okline"});
+      var show=function(){var a=num(f.subj),b=num(f.typ);out.textContent=a&&b?"Productivity is "+Math.round(100*a/b)+"% of the soils under your comparable sales. This is evidence to weigh, not an automatic deduction.":"Optional: compare productivity with the soils under your comparable sales (Parcel Scout shows ft³/ac/yr)."};
+      [sj,ty].forEach(function(i){i.addEventListener("input",show)});show();
+      card.appendChild(el("div",{cls:"r2"},[fld("Subject productivity",sj),fld("Comparable soils",ty)]));card.appendChild(out);
+    }
+    var tip=el("div",{cls:"tipline",text:"Watch: "+d.watch});card.appendChild(tip);
+    box.appendChild(card);
+  });
+  renderPicker();
+}
+
+/* ---------- results ---------- */
+var tipEl=$("#tip");
+function hoverTip(node,html){
+  node.addEventListener("mousemove",function(e){tipEl.innerHTML=html();tipEl.style.display="block";var x=e.clientX+14,y=e.clientY+14;if(x+270>innerWidth)x=e.clientX-274;if(y+120>innerHeight)y=e.clientY-120;tipEl.style.left=x+"px";tipEl.style.top=y+"px"});
+  node.addEventListener("mouseleave",function(){tipEl.style.display="none"});
+}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function update(){
+  S.name=$("#pName").value;S.acres=$("#pAcres").value;S.rate=$("#pRate").value;S.source=$("#pSource").value;save();
+  $("#demoNote").hidden=!S.demo;
+  var R=calc(S);
+  $("#pWarn").textContent=R.rate&&!str(S.source)?"Add where the $ per acre came from. Every deduction rests on it.":"";
+  $("#nGross").textContent=R.gross?usd(R.gross):"—";$("#nGrossSub").textContent=R.gross?ac(R.acres)+" × "+usd(R.rate)+"/ac":"acres × $ per acre";
+  $("#nAdj").textContent=R.gross?usdK(R.low)+" – "+usdK(R.high):"—";$("#nAdjSub").textContent=R.gross?usd(R.low/R.acres)+" – "+usd(R.high/R.acres)+" per acre":"low – high";
+  $("#nDed").textContent=R.gross?usdK(R.dedLo)+" – "+usdK(R.dedHi):"—";$("#nDedSub").textContent=R.gross?Math.round(100*R.dedLo/R.gross)+"–"+Math.round(100*R.dedHi/R.gross)+"% of unencumbered value":"—";
+  $("#nEv").textContent=R.adjusted?R.supported+" of "+R.adjusted:"—";$("#nEvSub").textContent=R.adjusted?(R.judgment?R.judgment+" by judgment · ":"")+(R.unsupported?R.unsupported+" with no evidence":"none unsupported"):"adjustments supported by market evidence";
+  var st=$("#status"),kind,title,body;
+  if(!R.gross){kind="wait";title="Enter the parcel to start.";body="Total acres and the unencumbered value per acre."}
+  else if(R.errors){kind="no";title="Not ready for sign-off.";body=R.errors+" issue"+(R.errors>1?"s":"")+" to resolve below."}
+  else if(R.judgment){kind="wait";title="Ready for sign-off review.";body="Judgment-based adjustments need the sign-off owner's explicit approval."}
+  else {kind="ok";title="Ready for sign-off review.";body="Every adjustment has market evidence and every acre is counted once."}
+  st.replaceChildren(el("div",{cls:"status "+kind},[el("strong",{text:title}),el("span",{text:" "+body})]));
+  var w=$("#warns");w.replaceChildren();R.warns.filter(function(x){return x.lvl!=="wait"||R.gross}).forEach(function(x){w.appendChild(el("li",{text:x.m,style:x.lvl==="wait"?"color:#ffe7bd":""}))});
+  // hero live
+  $("#heroLive").textContent=R.gross?usdK(R.low)+" – "+usdK(R.high)+" after deductions":"Load the example to see value move.";
+  $("#heroLiveSub").textContent=R.gross?"From "+usdK(R.gross)+" unencumbered · "+R.supported+" of "+R.adjusted+" adjustments market-supported":"Indicative only. Not an appraisal.";
+  renderWaffle(R);renderWaterfall(R);
+  $("#sumOut").textContent=summary(R);
+}
+function renderWaffle(R){
+  var box=$("#waffle"),cells=100;box.replaceChildren();
+  var groups={},order=["water","ease","env","terrain"];
+  R.rows.forEach(function(r){if(r.def.scope==="area"){groups[r.def.g]=(groups[r.def.g]||0)+r.acres}});
+  var total=Math.max(R.acres,R.areaAcres)||1,shares=[];
+  order.forEach(function(g){if(groups[g])shares.push({g:g,acres:groups[g],raw:cells*groups[g]/total})});
+  shares.push({g:"clear",acres:R.clear,raw:cells*R.clear/total});
+  var used=0;shares.forEach(function(s){s.n=Math.floor(s.raw);used+=s.n});
+  shares.slice().sort(function(a,b){return (b.raw-b.n)-(a.raw-a.n)}).forEach(function(s){if(used<cells&&s.raw>0){s.n++;used++}});
+  shares.forEach(function(s){
+    var name=s.g==="clear"?"Unencumbered":GROUPS[s.g].n,color=s.g==="clear"?"var(--g-clear)":GROUPS[s.g].c;
+    var parts=s.g==="clear"?"":R.rows.filter(function(r){return r.def.g===s.g&&r.def.scope==="area"}).map(function(r){return esc(r.def.n)+": "+ac(r.acres)}).join("<br>");
+    for(var i=0;i<s.n;i++){var c=el("div",{cls:"cell",style:"background:"+color});hoverTip(c,(function(nm,a,p){return function(){return "<b>"+esc(nm)+"</b>"+ac(a)+(R.acres?" · "+Math.round(100*a/R.acres)+"% of parcel":"")+(p?"<br>"+p:"")}})(name,s.acres,parts));box.appendChild(c)}
+  });
+  var lg=$("#legend");lg.replaceChildren();
+  shares.forEach(function(s){if(!s.acres&&s.g!=="clear")return;lg.appendChild(el("span",null,[el("i",{style:"background:"+(s.g==="clear"?"var(--g-clear)":GROUPS[s.g].c)}),(s.g==="clear"?"Unencumbered":GROUPS[s.g].n)+" · "+ac(s.acres)]))});
+  var wholeRows=R.rows.filter(function(r){return r.def.scope==="whole"});
+  if(wholeRows.length)lg.appendChild(el("span",null,[el("i",{style:"background:var(--g-whole)"}),"Whole-parcel: "+wholeRows.map(function(r){return r.def.n.split(/[(]/)[0].trim()}).join(", ")]));
+  $("#waffleNote").textContent=R.areaAcres>R.acres&&R.acres?"over-allocated: affected acres exceed the parcel":"each square ≈ 1% of the parcel";
+  box.setAttribute("aria-label","Acre map: "+shares.map(function(s){return (s.g==="clear"?"unencumbered":GROUPS[s.g].n)+" "+ac(s.acres)}).join(", "));
+}
+function renderWaterfall(R){
+  var box=$("#wf");box.replaceChildren();if(!R.gross){box.appendChild(el("div",{cls:"eg",text:"Value bars appear once acres and $ per acre are entered."}));return}
+  var max=Math.max(R.gross,R.high)||1,pct=function(v){return Math.max(0,Math.min(100,100*v/max))};
+  var row=function(name,left,width,color,val,tip,cls){
+    var tr=el("div",{cls:"track"},[el("div",{cls:"bar",style:"left:"+left+"%;width:"+Math.max(width,.6)+"%;background:"+color})]);
+    var r=el("div",{cls:"wfRow"+(cls?" "+cls:"")},[el("div",{cls:"nm",text:name,title:name}),tr,el("div",{cls:"val",text:val})]);
+    hoverTip(r,tip);box.appendChild(r);return tr;
+  };
+  row("Unencumbered",0,pct(R.gross),"#8a8c80",usdK(R.gross),function(){return "<b>Unencumbered value</b>"+ac(R.acres)+" × "+usd(R.rate)+"/ac = "+usd(R.gross)+"<br>Source: "+esc(str(S.source)||"not given")});
+  var run=R.gross;
+  R.rows.forEach(function(r){
+    var m=r.minus.mid,from=run-m;var left=pct(Math.min(from,run)),width=Math.abs(pct(run)-pct(from));
+    row(r.def.icon+" "+r.def.n,left,width,GROUPS[r.def.g].c,(m>=0?"−":"+")+usdK(Math.abs(m)).replace("−",""),function(){
+      var ev=EVID.find(function(e){return e[0]===r.f.ev});
+      return "<b>"+esc(r.def.n)+"</b>"+(r.def.scope==="area"?ac(r.acres)+" × "+usd(R.rate)+" × "+r.lo+"–"+r.hi+"%":"Whole parcel × "+r.lo+"–"+r.hi+"%")+"<br>Deduction: "+usd(r.minus.lo)+" – "+usd(r.minus.hi)+"<br>Evidence: "+esc(ev?ev[1]:"—")+(str(r.f.note)?"<br>"+esc(r.f.note):"")});
+    run=from;
+  });
+  var tr=row("Indicative adjusted",0,pct(R.mid),"linear-gradient(90deg,#e4a54b,#9aca75)",usdK(R.low)+"–"+usdK(R.high),function(){return "<b>Indicative adjusted value</b>Low "+usd(R.low)+" · mid "+usd(R.mid)+" · high "+usd(R.high)+"<br>Not an appraisal. Sign-off required."},"total");
+  tr.appendChild(el("div",{cls:"whisk",style:"left:"+pct(R.low)+"%;width:"+Math.max(.4,pct(R.high)-pct(R.low))+"%"}));
+}
+function summary(R){
+  var L=["LAND DEDUCTIONS: "+(str(S.name)||"(unnamed parcel)")+(S.demo?"  [TRAINING EXAMPLE, NOT MARKET DATA]":""),
+    "Acres: "+(R.acres||"-")+" | Unencumbered: "+(R.rate?usd(R.rate)+"/ac":"-")+" = "+(R.gross?usd(R.gross):"-"),
+    "Source of unencumbered value: "+(str(S.source)||"NOT GIVEN"),""];
+  R.rows.forEach(function(r,i){var ev=EVID.find(function(e){return e[0]===r.f.ev});
+    L.push((i+1)+". "+r.def.n+" — "+(r.def.scope==="area"?ac(r.acres):"whole parcel")+", "+r.lo+"–"+r.hi+"%, deduction "+usd(r.minus.lo)+"–"+usd(r.minus.hi)+" | Evidence: "+(ev?ev[1]:"-")+(str(r.f.note)?" | "+str(r.f.note):""))});
+  if(!R.rows.length)L.push("(no conditions entered)");
+  L.push("","Indicative adjusted value: "+(R.gross?usd(R.low)+" – "+usd(R.high):"-"),"Adjustments with market evidence: "+R.supported+" of "+R.adjusted+(R.unsupported?" | WITHOUT evidence: "+R.unsupported:""));
+  if(R.warns.length){L.push("","Open issues:");R.warns.forEach(function(w){L.push("- "+w.m)})}
+  L.push("","Indicative only. Not an appraisal. A named sign-off owner approves any figure before it reaches a landowner or an offer.");
+  return L.join("\n");
+}
+
+/* ---------- field guide ---------- */
+function renderGuide(){
+  var box=$("#guideList");
+  F.forEach(function(f){
+    var dl=el("dl");
+    [["What it does",f.what],["Measure",f.measure],["Where to look",f.where],["Evidence",f.evidence],["Double count",f.watch]].forEach(function(p){dl.appendChild(el("dt",{text:p[0]}));dl.appendChild(el("dd",{html:p[0]==="Where to look"?p[1]:esc(p[1])}))});
+    box.appendChild(el("article",{cls:"gcard",style:"--c:"+GROUPS[f.g].c},[el("div",{cls:"kind",text:GROUPS[f.g].n+" · "+(f.scope==="whole"?"whole parcel":"affected acres")}),el("h3",{text:f.icon+" "+f.n}),dl]));
+  });
+}
+
+/* ---------- topo hero ---------- */
+(function(){
+  var svg=$("#topo");if(!svg)return;var ns="http://www.w3.org/2000/svg",g=document.createElementNS(ns,"g");
+  var cx=380,cy=170;
+  for(var i=1;i<=16;i++){
+    var r=i*22,pts=[];
+    for(var a=0;a<=64;a++){var th=a/64*Math.PI*2,n=1+.16*Math.sin(3*th+i*.7)+.09*Math.cos(5*th-i*.4)+.05*Math.sin(9*th+i);pts.push([cx+Math.cos(th)*r*1.25*n,cy+Math.sin(th)*r*n])}
+    var d="M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join("L")+"Z";
+    var p=document.createElementNS(ns,"path");p.setAttribute("d",d);if(i%4===0)p.setAttribute("class","hi");g.appendChild(p);
+  }
+  var b=document.createElementNS(ns,"path");b.setAttribute("d","M150 70 L520 60 L540 330 L300 360 L170 300 Z");b.setAttribute("style","stroke:#f0d49a;stroke-width:2;stroke-dasharray:7 6;fill:rgba(240,212,154,.05)");g.appendChild(b);
+  var e=document.createElementNS(ns,"path");e.setAttribute("d","M150 150 L540 200");e.setAttribute("style","stroke:#d95926;stroke-width:14;opacity:.55");g.appendChild(e);
+  var w=document.createElementNS(ns,"path");w.setAttribute("d","M330 250 C360 225 430 230 450 262 C470 300 400 330 360 312 C320 300 310 270 330 250Z");w.setAttribute("style","fill:rgba(57,135,229,.35);stroke:#3987e5;stroke-width:1.5");g.appendChild(w);
+  svg.appendChild(g);
+})();
+
+/* ---------- inputs, files ---------- */
+function load(d){
+  S={demo:!!d.demo,name:str(d.name),acres:str(d.acres),rate:str(d.rate),source:str(d.source),factors:(Array.isArray(d.factors)?d.factors:[]).filter(function(f){return f&&FBY[f.k]}).map(function(f){return {k:f.k,acres:str(f.acres),lo:str(f.lo),hi:str(f.hi),ev:["paired","judgment","none"].indexOf(f.ev)>=0?f.ev:"none",note:str(f.note).slice(0,300),w:str(f.w),len:str(f.len),subj:str(f.subj),typ:str(f.typ)}})};
+  var seen={};S.factors=S.factors.filter(function(f){if(seen[f.k])return false;seen[f.k]=1;return true});
+  $("#pName").value=S.name;$("#pAcres").value=S.acres;$("#pRate").value=S.rate;$("#pSource").value=S.source;save();renderCards();update();
+}
+["#pName","#pAcres","#pRate","#pSource"].forEach(function(id){$(id).addEventListener("input",function(){S.demo=false;update()})});
+var loadEx=function(){load(JSON.parse(JSON.stringify(EXAMPLE)));$("#evaluator").scrollIntoView({behavior:"smooth"})};
+$("#exBtn").addEventListener("click",loadEx);$("#heroExample").addEventListener("click",loadEx);
+$("#clearBtn").addEventListener("click",function(){if(window.confirm("Clear this parcel and its conditions?"))load(BLANK)});
+$("#printBtn").addEventListener("click",function(){window.print()});
+$("#saveBtn").addEventListener("click",function(){
+  var name="land-deductions_"+((str(S.name)||"parcel").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50)||"parcel")+".json";
+  var blob=new Blob([JSON.stringify({type:"land-deductions",version:1,savedAt:new Date().toISOString(),data:S},null,2)],{type:"application/json"}),a=el("a",{href:URL.createObjectURL(blob),download:name});
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},800);
+});
+$("#openBtn").addEventListener("change",function(e){
+  var f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;var r=new FileReader();
+  r.onload=function(){try{var d=JSON.parse(String(r.result));if(!d||d.type!=="land-deductions"||!d.data)throw 0;load(d.data)}catch(x){$("#status").replaceChildren(el("div",{cls:"status no"},[el("strong",{text:"Not a deductions file."}),el("span",{text:" Choose a .json file downloaded from this page."})]))}};r.readAsText(f);
+});
+function copyText(text,btn){var ok=function(){var o=btn.textContent;btn.textContent="Copied";btn.classList.add("ok");setTimeout(function(){btn.textContent=o;btn.classList.remove("ok")},1400)};var fb=function(){var a=document.createElement("textarea");a.value=text;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(x){}a.remove()};if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(text).then(ok).catch(fb);else fb()}
+document.addEventListener("click",function(e){var b=e.target.closest(".copy");if(!b)return;var src=b.getAttribute("data-copy")?document.getElementById(b.getAttribute("data-copy")):b.closest(".pwrap").querySelector(".prompt");if(src)copyText(src.innerText,b)});
+
+renderGuide();load(S);
+window.__dedCalc=calc;
+})();
+
+</script>
+</body>
+</html>

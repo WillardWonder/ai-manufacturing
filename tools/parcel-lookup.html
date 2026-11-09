@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WI Parcel Owner Lookup</title>
+<style>
+  :root{
+    --paper:#FBFBF8;
+    --ink:#1A1A17;
+    --ink-soft:#5C5C54;
+    --line:#D9D7CC;
+    --line-soft:#ECEAE0;
+    --survey:#1F513F;      /* surveyor's ink green */
+    --survey-dim:#2f6b54;
+    --ochre:#A9742B;
+    --row-hover:#F4F2E9;
+    --bad:#8A2D2D;
+    --mono: ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+    --sans: -apple-system, system-ui, "Segoe UI", Roboto, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:var(--sans);}
+  body{
+    /* faint plat-grid backdrop */
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:28px 28px;
+    background-position:-1px -1px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 64px;}
+
+  header{border-bottom:2px solid var(--ink);padding:10px 0 14px;margin-bottom:18px;}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--survey);margin:0 0 4px;}
+  h1{font-size:25px;line-height:1.1;margin:0;font-weight:650;letter-spacing:-0.01em;}
+  .sub{font-size:13px;color:var(--ink-soft);margin:6px 0 0;max-width:62ch;}
+  .sub a{color:var(--survey);text-decoration:none;border-bottom:1px solid var(--line);}
+
+  /* controls */
+  .panel{background:#fff;border:1px solid var(--line);border-radius:4px;padding:14px;margin-bottom:16px;}
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;}
+  .field{display:flex;flex-direction:column;gap:5px;}
+  .field label{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}
+  select,input{
+    font-family:var(--sans);font-size:15px;color:var(--ink);background:var(--paper);
+    border:1px solid var(--line);border-radius:3px;padding:9px 10px;min-height:42px;
+  }
+  select:focus,input:focus{outline:2px solid var(--survey);outline-offset:-1px;border-color:var(--survey);}
+  #county{min-width:200px;}
+  .acre{width:108px;}
+  button{
+    font-family:var(--sans);font-size:15px;font-weight:600;cursor:pointer;
+    background:var(--survey);color:#fff;border:1px solid var(--survey);border-radius:3px;
+    padding:10px 20px;min-height:42px;
+  }
+  button:hover:not(:disabled){background:var(--survey-dim);}
+  button:disabled{opacity:.55;cursor:default;}
+  button.ghost{background:transparent;color:var(--survey);}
+  button.ghost:hover:not(:disabled){background:var(--row-hover);}
+  .hint{font-family:var(--mono);font-size:11px;color:var(--ink-soft);margin-top:10px;}
+
+  /* status + meta */
+  .status{font-family:var(--mono);font-size:13px;padding:10px 0;}
+  .status.err{color:var(--bad);}
+  .metabar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin:4px 0 10px;}
+  .count{font-size:14px;}
+  .count b{font-family:var(--mono);color:var(--survey);font-size:16px;}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .tools input{min-height:38px;padding:7px 9px;font-size:14px;width:180px;}
+  .banner{background:#FBF4E4;border:1px solid var(--ochre);color:#6b4a17;font-size:13px;padding:8px 11px;border-radius:3px;margin-bottom:10px;}
+
+  /* table */
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:#fff;}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;}
+  thead th{
+    position:sticky;top:0;background:var(--paper);text-align:left;font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);
+    padding:10px 12px;border-bottom:2px solid var(--ink);white-space:nowrap;cursor:pointer;user-select:none;
+  }
+  thead th .arw{color:var(--survey);}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top;}
+  tbody tr:hover{background:var(--row-hover);}
+  .owner{font-weight:600;max-width:30ch;}
+  .owner2{display:block;font-weight:400;color:var(--ink-soft);font-size:12.5px;}
+  .addr{max-width:26ch;color:var(--ink-soft);}
+  .num{font-family:var(--mono);text-align:right;white-space:nowrap;}
+  .pid{font-family:var(--mono);font-size:12px;color:var(--ink-soft);white-space:nowrap;}
+  .maplink{font-family:var(--mono);font-size:12px;color:var(--survey);text-decoration:none;border-bottom:1px solid var(--line);}
+  .rownum{font-family:var(--mono);color:#a8a89c;font-size:11px;text-align:right;}
+  .empty{padding:34px 16px;text-align:center;color:var(--ink-soft);font-size:14px;}
+
+  .foot{margin-top:18px;font-size:11.5px;color:var(--ink-soft);line-height:1.5;max-width:74ch;}
+  .foot code{font-family:var(--mono);font-size:11px;background:#fff;border:1px solid var(--line-soft);padding:1px 4px;border-radius:2px;}
+
+  @media (max-width:560px){
+    h1{font-size:21px;}
+    .acre{width:100%;}
+    .field{flex:1 1 100%;}
+    #county{width:100%;min-width:0;}
+    button{flex:1 1 100%;}
+    .tools input{width:100%;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="kicker">Wisconsin Statewide Parcel Map · V11 / 2025</p>
+    <h1>Parcel Owner Lookup</h1>
+    <p class="sub">Find property owners by county and parcel size, straight from the State Cartographer's Office <a href="https://www.sco.wisc.edu/parcels/data/" target="_blank" rel="noopener">public parcel layer</a>. No account, no key &mdash; public tax-roll records.</p>
+  </header>
+
+  <div class="panel">
+    <div class="controls">
+      <div class="field">
+        <label for="county">County</label>
+        <select id="county"><option value="">Loading counties&hellip;</option></select>
+      </div>
+      <div class="field">
+        <label for="minac">Min acres</label>
+        <input id="minac" class="acre" type="number" inputmode="decimal" min="0" step="1" value="40" placeholder="e.g. 40">
+      </div>
+      <div class="field">
+        <label for="maxac">Max acres <span style="text-transform:none;letter-spacing:0">(opt.)</span></label>
+        <input id="maxac" class="acre" type="number" inputmode="decimal" min="0" step="1" placeholder="none">
+      </div>
+      <button id="go" disabled>Search parcels</button>
+    </div>
+    <p class="hint">Filters on GIS-calculated acreage. Results are capped at 5,000 rows &mdash; raise the minimum to narrow a big county.</p>
+  </div>
+
+  <div id="status" class="status"></div>
+  <div id="results"></div>
+
+  <p class="foot">
+    Source: Wisconsin Statewide Parcel Map Initiative (Wisconsin State Cartographer's Office / Dept. of Administration), endpoint <code>Wisconsin_Statewide_Parcels/FeatureServer/0</code>. Owner names reflect the most recent tax roll submitted by each county and may lag recent sales. This is parcel/tax data, <b>not</b> a legal boundary survey. Data is provided free of charge by the State of Wisconsin.
+  </p>
+</div>
+
+<script>
+const QUERY_URL = "https://services3.arcgis.com/n6uYoouQZW75n5WI/arcgis/rest/services/Wisconsin_Statewide_Parcels/FeatureServer/0/query";
+const PAGE = 2000;
+const MAX_RECORDS = 5000;
+const FIELDS = "OWNERNME1,OWNERNME2,PSTLADRESS,SITEADRESS,GISACRES,DEEDACRES,CNTASSDVALUE,PROPCLASS,PARCELID,LATITUDE,LONGITUDE,CONAME";
+
+const COUNTIES_FALLBACK = ["ADAMS","ASHLAND","BARRON","BAYFIELD","BROWN","BUFFALO","BURNETT","CALUMET","CHIPPEWA","CLARK","COLUMBIA","CRAWFORD","DANE","DODGE","DOOR","DOUGLAS","DUNN","EAU CLAIRE","FLORENCE","FOND DU LAC","FOREST","GRANT","GREEN","GREEN LAKE","IOWA","IRON","JACKSON","JEFFERSON","JUNEAU","KENOSHA","KEWAUNEE","LA CROSSE","LAFAYETTE","LANGLADE","LINCOLN","MANITOWOC","MARATHON","MARINETTE","MARQUETTE","MENOMINEE","MILWAUKEE","MONROE","OCONTO","ONEIDA","OUTAGAMIE","OZAUKEE","PEPIN","PIERCE","POLK","PORTAGE","PRICE","RACINE","RICHLAND","ROCK","RUSK","SAUK","SAWYER","SHAWANO","SHEBOYGAN","ST. CROIX","TAYLOR","TREMPEALEAU","VERNON","VILAS","WALWORTH","WASHBURN","WASHINGTON","WAUKESHA","WAUPACA","WAUSHARA","WINNEBAGO","WOOD"];
+
+const $ = id => document.getElementById(id);
+const countySel = $("county"), minInput = $("minac"), maxInput = $("maxac"), goBtn = $("go");
+const statusEl = $("status"), resultsEl = $("results");
+
+let currentRows = [];      // full fetched set
+let viewRows = [];         // after client-side text filter + sort
+let sortField = "GISACRES", sortDir = -1;
+let filterText = "";
+
+const qs = p => Object.entries(p).map(([k,v]) => encodeURIComponent(k)+"="+encodeURIComponent(v)).join("&");
+const escSql = s => String(s).replace(/'/g, "''");
+const fmtNum = (n,d=2) => (n==null||isNaN(n)) ? "\u2014" : Number(n).toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});
+const fmtUSD = n => (n==null||isNaN(n)||n===0) ? "\u2014" : "$"+Number(n).toLocaleString(undefined,{maximumFractionDigits:0});
+const esc = s => (s==null?"":String(s)).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+async function arcgis(params){
+  const res = await fetch(QUERY_URL+"?"+qs({f:"json",...params}));
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  const data = await res.json();
+  if(data.error) throw new Error(data.error.message || "Service error");
+  return data;
+}
+
+async function loadCounties(){
+  let names = null;
+  try{
+    const data = await arcgis({where:"1=1", outFields:"CONAME", returnDistinctValues:"true", returnGeometry:"false", orderByFields:"CONAME"});
+    names = [...new Set((data.features||[]).map(f=>f.attributes.CONAME).filter(Boolean))].sort();
+    if(!names.length) names = null;
+  }catch(e){ names = null; }
+  names = names || COUNTIES_FALLBACK;
+  countySel.innerHTML = '<option value="">Select a county&hellip;</option>' +
+    names.map(n=>`<option value="${esc(n)}">${esc(titleCase(n))}</option>`).join("");
+  goBtn.disabled = false;
+}
+
+function titleCase(s){
+  return s.toLowerCase().replace(/\b\w/g, c=>c.toUpperCase()).replace(/\bMc(\w)/g,(m,p)=>"Mc"+p.toUpperCase());
+}
+
+function setStatus(msg, isErr){
+  statusEl.textContent = msg || "";
+  statusEl.className = "status" + (isErr?" err":"");
+}
+
+async function search(){
+  const county = countySel.value;
+  if(!county){ setStatus("Pick a county first."); return; }
+  const minAc = parseFloat(minInput.value);
+  const maxAc = parseFloat(maxInput.value);
+
+  let where = `UPPER(CONAME) = '${escSql(county).toUpperCase()}'`;
+  if(!isNaN(minAc)) where += ` AND GISACRES >= ${minAc}`;
+  if(!isNaN(maxAc)) where += ` AND GISACRES <= ${maxAc}`;
+
+  goBtn.disabled = true;
+  resultsEl.innerHTML = "";
+  setStatus("Querying "+titleCase(county)+" County\u2026");
+
+  try{
+    const t0 = performance.now();
+    const countData = await arcgis({where, returnCountOnly:"true"});
+    const total = countData.count || 0;
+
+    if(total === 0){
+      currentRows = []; renderEmpty(county, minAc, maxAc);
+      setStatus(""); goBtn.disabled = false; return;
+    }
+
+    const want = Math.min(total, MAX_RECORDS);
+    const rows = [];
+    for(let offset=0; offset<want; offset+=PAGE){
+      setStatus(`Fetching parcels\u2026 ${rows.length.toLocaleString()} / ${want.toLocaleString()}`);
+      const data = await arcgis({
+        where, outFields:FIELDS, returnGeometry:"false",
+        orderByFields:"GISACRES DESC", resultRecordCount:PAGE, resultOffset:offset
+      });
+      const feats = data.features || [];
+      feats.forEach(f => rows.push(f.attributes));
+      if(feats.length < PAGE) break;
+    }
+
+    const secs = ((performance.now()-t0)/1000).toFixed(1);
+    currentRows = rows;
+    sortField = "GISACRES"; sortDir = -1; filterText = "";
+    setStatus("");
+    renderResults(total, county, minAc, maxAc, secs);
+  }catch(e){
+    setStatus("Couldn't reach the parcel service: "+e.message+". The state endpoint may be busy \u2014 try again in a moment, or check your connection.", true);
+  }finally{
+    goBtn.disabled = false;
+  }
+}
+
+function renderEmpty(county, minAc, maxAc){
+  const range = describeRange(minAc, maxAc);
+  resultsEl.innerHTML =
+    `<div class="tablewrap"><div class="empty">No parcels in <b>${esc(titleCase(county))} County</b> ${range}.<br>Try lowering the minimum acreage.</div></div>`;
+}
+
+function describeRange(minAc, maxAc){
+  if(!isNaN(minAc) && !isNaN(maxAc)) return `between ${minAc} and ${maxAc} acres`;
+  if(!isNaN(minAc)) return `of ${minAc}+ acres`;
+  if(!isNaN(maxAc)) return `up to ${maxAc} acres`;
+  return "";
+}
+
+function applyView(){
+  const f = filterText.trim().toLowerCase();
+  viewRows = !f ? currentRows.slice() : currentRows.filter(r =>
+    (r.OWNERNME1||"").toLowerCase().includes(f) ||
+    (r.OWNERNME2||"").toLowerCase().includes(f) ||
+    (r.SITEADRESS||"").toLowerCase().includes(f)
+  );
+  viewRows.sort((a,b)=>{
+    let x=a[sortField], y=b[sortField];
+    if(typeof x==="string"||typeof y==="string"){ x=(x||"").toString().toLowerCase(); y=(y||"").toString().toLowerCase(); }
+    else { x=x==null?-Infinity:x; y=y==null?-Infinity:y; }
+    return x<y?-1*sortDir : x>y?1*sortDir : 0;
+  });
+}
+
+function renderResults(total, county, minAc, maxAc, secs){
+  applyView();
+  const capped = total > MAX_RECORDS;
+  const cols = [
+    {f:"OWNERNME1", label:"Owner"},
+    {f:"SITEADRESS", label:"Site address"},
+    {f:"GISACRES", label:"GIS ac", num:true},
+    {f:"DEEDACRES", label:"Deeded ac", num:true},
+    {f:"CNTASSDVALUE", label:"Assessed", num:true},
+    {f:"PROPCLASS", label:"Class"},
+    {f:"PARCELID", label:"Parcel ID"},
+  ];
+  const arrow = f => f===sortField ? `<span class="arw">${sortDir<0?"\u25BC":"\u25B2"}</span>` : "";
+
+  let html = "";
+  if(capped) html += `<div class="banner">Showing the largest <b>${MAX_RECORDS.toLocaleString()}</b> of <b>${total.toLocaleString()}</b> matching parcels. Raise the minimum acreage to see a complete set.</div>`;
+
+  html += `<div class="metabar">
+    <div class="count"><b>${total.toLocaleString()}</b> parcels in ${esc(titleCase(county))} County ${describeRange(minAc,maxAc)} &middot; <span style="color:var(--ink-soft)">${secs}s</span></div>
+    <div class="tools">
+      <input id="filter" type="text" placeholder="Filter owner / address\u2026" value="${esc(filterText)}">
+      <button class="ghost" id="csv">Export CSV</button>
+    </div>
+  </div>`;
+
+  html += `<div class="tablewrap"><table><thead><tr><th class="rownum">#</th>` +
+    cols.map(c=>`<th data-f="${c.f}">${c.label} ${arrow(c.f)}</th>`).join("") +
+    `<th>Map</th></tr></thead><tbody>`;
+
+  html += viewRows.map((r,i)=>{
+    const owner2 = r.OWNERNME2 ? `<span class="owner2">${esc(r.OWNERNME2)}</span>` : "";
+    const map = (r.LATITUDE && r.LONGITUDE)
+      ? `<a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${r.LATITUDE},${r.LONGITUDE}">view</a>`
+      : "\u2014";
+    return `<tr>
+      <td class="rownum">${i+1}</td>
+      <td class="owner">${esc(r.OWNERNME1)||"\u2014"}${owner2}</td>
+      <td class="addr">${esc(r.SITEADRESS)||"\u2014"}</td>
+      <td class="num">${fmtNum(r.GISACRES)}</td>
+      <td class="num">${fmtNum(r.DEEDACRES)}</td>
+      <td class="num">${fmtUSD(r.CNTASSDVALUE)}</td>
+      <td>${esc(r.PROPCLASS)||"\u2014"}</td>
+      <td class="pid">${esc(r.PARCELID)||"\u2014"}</td>
+      <td>${map}</td>
+    </tr>`;
+  }).join("");
+
+  html += `</tbody></table></div>`;
+  if(filterText && viewRows.length===0) html += `<div class="empty">No rows match \u201c${esc(filterText)}\u201d.</div>`;
+  resultsEl.innerHTML = html;
+
+  // wire row-level controls
+  resultsEl.querySelectorAll("thead th[data-f]").forEach(th=>{
+    th.addEventListener("click", ()=>{
+      const f = th.dataset.f;
+      if(f===sortField) sortDir *= -1; else { sortField=f; sortDir = (f==="OWNERNME1"||f==="SITEADRESS"||f==="PROPCLASS"||f==="PARCELID")?1:-1; }
+      renderResults(total, county, minAc, maxAc, secs);
+    });
+  });
+  const fi = $("filter");
+  if(fi) fi.addEventListener("input", e=>{ filterText = e.target.value; renderResults(total, county, minAc, maxAc, secs); 
+    const again=$("filter"); if(again){ again.focus(); again.setSelectionRange(again.value.length,again.value.length);} });
+  const csv = $("csv");
+  if(csv) csv.addEventListener("click", ()=>exportCSV(county));
+}
+
+function exportCSV(county){
+  const headers = ["Owner","Owner 2","Site Address","Mailing Address","GIS Acres","Deeded Acres","Assessed Value","Class","Parcel ID","County","Lat","Lon"];
+  const cell = v => { const s = v==null?"":String(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const lines = [headers.join(",")];
+  viewRows.forEach(r=>lines.push([
+    r.OWNERNME1,r.OWNERNME2,r.SITEADRESS,r.PSTLADRESS,r.GISACRES,r.DEEDACRES,r.CNTASSDVALUE,r.PROPCLASS,r.PARCELID,r.CONAME,r.LATITUDE,r.LONGITUDE
+  ].map(cell).join(",")));
+  const blob = new Blob(["\ufeff"+lines.join("\n")], {type:"text/csv;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `${county.toLowerCase().replace(/[^a-z]/g,"")}_parcels.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+goBtn.addEventListener("click", search);
+[minInput,maxInput].forEach(el=>el.addEventListener("keydown",e=>{ if(e.key==="Enter") search(); }));
+loadCounties();
+</script>
+</body>
+</html>
+//
