@@ -23,6 +23,7 @@
       <li><a href="#uses">Where it helps</a></li>
       <li><a href="#safe">Guardrails</a></li>
       <li><a href="#start">Start Monday</a></li>
+      <li><a href="#help">Get help</a></li>
       <li><a href="#prompts">Prompts</a></li>
     </ul>
     <a class="present" href="present.html">Present</a>
@@ -48,9 +49,22 @@
   <div class="stripe" aria-hidden="true"></div>
 </header>
 
+<section class="sec" id="reality" style="padding-bottom:0">
+  <div class="body">
+    <p class="kicker" style="color:var(--gray);margin-bottom:14px">Where manufacturers really are</p>
+    <h2 style="font-size:clamp(36px,4.4vw,60px);line-height:.95;max-width:18em;margin-bottom:28px">You're not behind. Almost nobody has this figured out.</h2>
+    <div class="grid g3">
+      <div class="card" style="border-top-color:var(--yellow)"><h3 style="font-size:52px">Under 1 in 5</h3><p>US manufacturers use AI in any part of the business, below the all-industry average.</p></div>
+      <div class="card" style="border-top-color:var(--yellow)"><h3 style="font-size:52px">1 in 5</h3><p>AI projects, even at manufacturers already seeing value, have been scaled across sites.</p></div>
+      <div class="card" style="border-top-color:var(--yellow)"><h3 style="font-size:52px">41%</h3><p>of manufacturers give their frontline workers no AI training at all.</p></div>
+    </div>
+    <p class="note">Sources: US Census Bureau Business Trends and Outlook Survey (2026); Deloitte, AI in Manufacturing 2026; National Association of Manufacturers, Manufacturers' Outlook Survey, Q2 2026.</p>
+  </div>
+</section>
+
 <!-- ================= DALE ================= -->
 <section class="sec" id="dale">
-  <div class="sh"><span class="no">01</span><div><h2>Watch it work.</h2><p>Every shop has a Dale: 31 years on Press 4 and the only one who really knows the die change. Here's how AI gets that out of his head and onto the floor.</p></div></div>
+  <div class="sh"><span class="no">01</span><div><h2>Watch it work.</h2><p>Every shop has a Dale: 31 years on Press 4 and the only one who really knows the die change. A quarter of Wisconsin's manufacturing workforce is approaching retirement. Here's how AI helps get that knowledge out of his head and onto the floor.</p></div></div>
   <div class="body">
     <div class="demo" id="demo">
       <div class="demoTop" role="tablist" aria-label="Example steps"></div>
@@ -60,7 +74,7 @@
           <h3>Start with the expert, not the keyboard.</h3>
           <p class="why">Dale talked through his die change while someone recorded it on a phone. Most phones turn a voice memo into text for free.</p>
           <p class="outLbl">Dale's voice memo, word for word</p>
-          <div class="out raw">"Okay so first thing, you lock it out, obviously, main disconnect and the air. Then I always run the slide down to bottom dead center before I pull anything. Some guys don't and that's how you get pinched. Pull the old die, use the cart, not the forklift, the forklift guys always ding the shoes. Clean the bolster, I mean really clean it, one chip under there and your parts are out. Set the new die, line up the locating pins, then the clamps. Snug them, then torque them, there's a number on the sheet in the office. Shut height, you check that before you cycle, every time. Then inch it through once, then one part, then you call quality for first article before you run. Oh, and the scrap chute, swap it if you're going from the four-inch brackets to the long ones."</div>
+          <div class="out raw">"Okay so once it's locked out the way the tag on Press 4 says, you pull the old die. Use the cart, not the forklift, the forklift guys always ding the shoes. Clean the bolster, I mean really clean it, one chip under there and your parts are out. Set the new die, line up the locating pins, then the clamps. Snug them, then torque them, there's a number on the sheet in the office. Shut height, you check that before you cycle, every time. Then inch it through once, then one part, then you call quality for first article before you run. Oh, and the scrap chute, swap it if you're going from the four-inch brackets to the long ones."</div>
           <p class="dnote"><b>This part isn't AI.</b>The knowledge comes from a person. AI's job is to turn it into something everyone can use.</p>
         </div>
       </article>
@@ -84,11 +98,11 @@
 <div class="prompt" data-mode="show">Turn the transcript below into a one-page work instruction for the Press 4 die change.
 
 Who it's for: operators with less than a year of experience. Some read English as a second language.
-Format: numbered steps, one action per step, short sentences. Safety steps first, marked SAFETY.
-Rules: Use only what's in the transcript. Don't add steps he didn't say. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing.
+Format: numbered steps, one action per step, short sentences.
+Rules: Start by stating the press must be locked out using its posted lockout procedure. Don't write lockout steps. Use only what's in the transcript. Don't add steps he didn't say. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing.
 
 Transcript: [Dale's voice memo]</div>
-          <p class="dnote"><b>No magic words.</b>The audience, the format, and a rule against making things up. Context only you have.</p>
+          <p class="dnote"><b>No magic words.</b>The audience, the format, and rules about what it must not do, including writing safety procedures it doesn't own.</p>
         </div>
       </article>
 
@@ -97,22 +111,22 @@ Transcript: [Dale's voice memo]</div>
           <h3>A draft that's actually Dale's.</h3>
           <div class="out">PRESS 4 DIE CHANGE: WORK INSTRUCTION
 
-SAFETY 1. Lock out the main disconnect and the air supply.
-SAFETY 2. Run the slide down to bottom dead center before removing anything.
-3. Remove the old die with the die cart. Do not use the forklift.
-4. Clean the bolster completely. One chip can put parts out of spec.
-5. Set the new die. Line up the locating pins.
-6. Snug the clamps. Then torque them to the value on the setup sheet.
-7. Check shut height before cycling the press.
-8. Inch the press through one full stroke.
-9. Run one part. Call Quality for first-article inspection before running production.
-10. If changing from 4-inch brackets to long brackets, swap the scrap chute.
+BEFORE YOU START: Press 4 must be locked out using its posted lockout procedure. This instruction does not replace it.
+
+1. Remove the old die with the die cart. Do not use the forklift.
+2. Clean the bolster completely. One chip can put parts out of spec.
+3. Set the new die. Line up the locating pins.
+4. Snug the clamps. Then torque them to the value on the setup sheet.
+5. Check shut height before cycling the press.
+6. Inch the press through one full stroke.
+7. Run one part. Call Quality for first-article inspection before running production.
+8. If changing from 4-inch brackets to long brackets, swap the scrap chute.
 
 Questions for the supervisor
 - What is the clamp torque value, and where is the setup sheet kept?
 - What is the correct shut height for each die?
-- Does lockout include any other energy sources, such as hydraulic or stored pressure?</div>
-          <p class="dnote"><b>Every step traces back to Dale.</b>The gaps became questions instead of guesses, including one about other energy sources a supervisor needs to answer.</p>
+- Who verifies the lockout before the die is pulled?</div>
+          <p class="dnote"><b>Every step traces back to Dale.</b>The gaps became questions instead of guesses, and lockout stays where it belongs: in the press's own procedure.</p>
         </div>
       </article>
 
@@ -129,8 +143,9 @@ Questions for the supervisor
         <div class="demoBody">
           <h3>A person checks it, finishes it, and signs it.</h3>
           <p class="why">Dale and his supervisor answer the three questions, add the torque value and shut heights, have the Spanish checked, then sign, date, and post it at the press.</p>
-          <ul class="checks"><li>Every step matches how the job is really done</li><li>Every number comes from the setup sheet, not the AI</li><li>Safety steps checked against your lockout program</li><li>Signed and dated by the people responsible</li></ul>
+          <ul class="checks"><li>Every step matches how the job is really done</li><li>Every number comes from the setup sheet, not the AI</li><li>Lockout stays in the press's posted energy control procedure, owned by safety</li><li>Signed and dated by the people responsible</li></ul>
           <p class="dnote"><b>The time moves from writing to reviewing.</b>The knowledge stays Dale's. The sign-off stays human. This works for any job that lives in one person's head.</p>
+          <p class="dnote warn"><b>Know where AI stops.</b>Lockout is regulated. OSHA (29 CFR 1910.147) requires written, machine-specific energy control procedures that are verified before work starts and inspected every year. AI can draft work instructions; your safety process owns safety procedures.</p>
         </div>
       </article>
 
@@ -142,8 +157,8 @@ Questions for the supervisor
 <div class="prompt" data-mode="new">Turn the transcript below into a one-page work instruction for [the job].
 
 Who it's for: [who will use it and how experienced they are].
-Format: numbered steps, one action per step, short sentences. Safety steps first, marked SAFETY.
-Rules: Use only what's in the transcript. Don't add steps that weren't said. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing.
+Format: numbered steps, one action per step, short sentences.
+Rules: If the job requires lockout or another regulated safety procedure, say so at the top and refer to that procedure. Don't write those steps. Use only what's in the transcript. Don't add steps that weren't said. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing.
 
 Transcript: [paste it here]</div>
   </div>
@@ -200,6 +215,20 @@ Transcript: [paste it here]</div>
       <div class="tier"><div><span class="step">Biggest lift</span><h3>Industrial AI systems</h3></div><div><div class="tags"><span>Vision inspection</span><span>Predictive maintenance</span><span>Forecasting</span><span>Scheduling</span></div><p>Cameras, sensors, and connections to your equipment and data. Powerful when the problem is clear and the data is good.</p></div><div class="price">A real project<small>budget, integration, clean data, and a pilot. Start with a problem, not the technology.</small></div></div>
     </div>
     <p class="note">US list prices as of November 2026. Products and prices change often; check before you buy. Names are examples, not endorsements.</p>
+    <h3 class="big">Before you buy anything bigger.</h3>
+    <p class="lead">Practical advice from NIST's Manufacturing Extension Partnership for small and mid-sized manufacturers:</p>
+    <div class="grid g4">
+      <div class="card"><span class="lbl">01</span><h3>One problem</h3><p>Pick one focused, measurable problem: downtime, scrap, or quality.</p></div>
+      <div class="card"><span class="lbl">02</span><h3>Simple fix first</h3><p>Try root cause analysis, a checklist, a standard procedure, or training. Compare the cost before buying AI.</p></div>
+      <div class="card"><span class="lbl">03</span><h3>Business numbers</h3><p>Judge it on scrap, throughput, and downtime, not on "accuracy."</p></div>
+      <div class="card"><span class="lbl">04</span><h3>A real pilot</h3><p>Weeks, not a day. Test normal runs and rare ones. Budget for ongoing upkeep.</p></div>
+    </div>
+    <div class="callout"><b>"98% accurate" can mean useless.</b> A defect model that calls every part "good" is 98% accurate when 2% of parts are bad.</div>
+    <h3 class="big">Questions to ask any AI vendor.</h3>
+    <div class="grid g2">
+      <div class="card"><ul><li>Where has this worked on a problem like ours?</li><li>What data does it need, and in what shape?</li><li>When does it fail, and how will we know?</li><li>How does it connect to our ERP and maintenance system?</li></ul></div>
+      <div class="card"><ul><li>What's the full cost: licenses, usage, setup, people, upkeep?</li><li>Who monitors and retrains it after go-live?</li><li>Where does our data go, and is it used to train your models?</li><li>Can we run a paid pilot before we commit?</li></ul></div>
+    </div>
   </div>
 </section>
 
@@ -225,18 +254,32 @@ Transcript: [paste it here]</div>
   <div class="body">
     <div class="dd">
       <div class="no"><h3>Don't paste in</h3><ul><li>Customer drawings, specs, or pricing under NDA</li><li>Export-controlled or defense-related data</li><li>Employee personal or medical information</li><li>Passwords or system access details</li><li>Anything your contracts say stays inside</li></ul></div>
-      <div class="yes"><h3>Always check</h3><ul><li>Every number: dimensions, torque, tolerances, quantities</li><li>Every safety step, against your actual programs</li><li>Names, dates, part numbers, and sources</li><li>Translations, with a fluent speaker</li><li>That it still answers what you asked</li></ul></div>
+      <div class="yes"><h3>Always check</h3><ul><li>Every number: dimensions, torque, tolerances, quantities</li><li>Every safety step, against your actual programs. Regulated procedures like lockout stay with your safety process.</li><li>Names, dates, part numbers, and sources</li><li>Translations, with a fluent speaker</li><li>That it still answers what you asked</li></ul></div>
     </div>
     <div class="callout"><b>Free versus business accounts.</b> Free accounts may use your conversations to improve their models unless you change the settings. Business plans generally offer stronger protections. Read the terms, and when in doubt, describe the situation instead of pasting the real document.</div>
     <p class="bar">If you wouldn't email it to a stranger, don't paste it in.</p>
-    <p class="lead">You don't need a 30-page policy to start. One page that says which tools are approved, what never goes in, and that a person reviews anything leaving the building covers most of the risk.</p>
+    <h3 class="big">One page covers most of the risk.</h3>
+    <p class="lead">Your people are probably already using AI on personal accounts. You don't need a 30-page policy to start. One page that answers four questions:</p>
+    <div class="grid g4">
+      <div class="card"><span class="lbl">01</span><h3>Approved tools</h3><p>Give people a safe option, or they'll keep using their own.</p></div>
+      <div class="card"><span class="lbl">02</span><h3>What never goes in</h3><p>The data that stays inside, no exceptions.</p></div>
+      <div class="card"><span class="lbl">03</span><h3>Who signs off</h3><p>A person reviews anything that leaves the building.</p></div>
+      <div class="card"><span class="lbl">04</span><h3>Who owns it</h3><p>One named person, not a committee.</p></div>
+    </div>
+    <p class="note">Want a framework later? NIST's AI Risk Management Framework and its Generative AI Profile (NIST AI 600-1) are free and voluntary.</p>
   </div>
 </section>
 
 <!-- ================= START ================= -->
 <section class="sec" id="start">
-  <div class="sh"><span class="no">07</span><div><h2>Start Monday.</h2><p>Four habits that get good results, and five steps to prove it on one real task.</p></div></div>
+  <div class="sh"><span class="no">07</span><div><h2>Start Monday.</h2><p>Bring your people in, use four habits that get good results, and prove it on one real task.</p></div></div>
   <div class="body">
+    <h3 class="big" style="margin-top:0">Bring the floor in early.</h3>
+    <div class="grid g3" style="margin-bottom:56px">
+      <div class="card"><h3>Involve them from day one</h3><p>Operators and supervisors know where the real problems are, and they decide whether a tool gets used.</p></div>
+      <div class="card"><h3>Train the floor, not just the office</h3><p>41% of manufacturers give frontline workers no AI training at all.</p></div>
+      <div class="card"><h3>Say what it's for</h3><p>Helping people do the job. Not replacing the people who know it.</p></div>
+    </div>
     <div class="grid g4 habits">
       <div class="habit"><h3>Know what finished looks like.</h3><p>Who uses the result, and what can they do with it?</p></div>
       <div class="habit"><h3>Give it your context.</h3><p>Who it's for, the format, your source material, your rules.</p></div>
@@ -248,15 +291,26 @@ Transcript: [paste it here]</div>
       <li><div><h3>Pick one annoying task.</h3><p>Repeated, written, time-consuming. A weekly report, a type of email, a missing work instruction.</p></div></li>
       <li><div><h3>Write down what finished looks like.</h3><p>Who uses it, and what they'll be able to do.</p></div></li>
       <li><div><h3>Try it with non-sensitive material.</h3><p>A general assistant and the four habits. Expect some back and forth.</p></div></li>
-      <li><div><h3>Compare it honestly.</h3><p>Faster? As good, once a person reviewed it? Be honest about both.</p></div></li>
+      <li><div><h3>Measure it.</h3><p>Minutes per document before and after, and what review still caught. Be honest about both.</p></div></li>
       <li><div><h3>Share it, and write the rule.</h3><p>Save the prompt that worked, show a coworker, and put your one-page guardrails in writing.</p></div></li>
     </ol>
   </div>
 </section>
 
+<!-- ================= HELP ================= -->
+<section class="sec alt" id="help">
+  <div class="sh"><span class="no">08</span><div><h2>Get help close to home.</h2><p>You don't have to figure this out alone. Both of these are right here in central Wisconsin.</p></div></div>
+  <div class="body">
+    <div class="grid g2">
+      <a class="tool" href="https://www.ntc.edu/central-wi-ai-center" target="_blank" rel="noopener"><span class="tt">Central Wisconsin AI Center</span><span class="tb"><h3>CWAIC</h3><p>A regional AI readiness hub based at Northcentral Technical College in Wausau, in partnership with UW-Stevens Point, UW-Stout, and the Greater Wausau Chamber of Commerce. Assessments, training, and implementation support to help organizations adopt AI practically and responsibly. Basic membership is free.</p><span class="go">ntc.edu/central-wi-ai-center</span></span></a>
+      <a class="tool" href="https://www.ntc.edu/workforce-training-professional-development" target="_blank" rel="noopener"><span class="tt">NTC Workforce Training + Professional Development</span><span class="tb"><h3>Custom training and projects</h3><p>Training, technical assistance, and consulting built around your shop and your people, from AI to quality, safety, and leadership. NTC's team serves more than 900 businesses and 10,000 professionals a year. Call 715.803.1243.</p><span class="go">Workforce Training at NTC</span></span></a>
+    </div>
+  </div>
+</section>
+
 <!-- ================= PROMPTS ================= -->
 <section class="sec dark" id="prompts">
-  <div class="sh"><span class="no">08</span><div><h2>Prompts to keep.</h2><p>Starting points for common shop tasks. Fill in the brackets, remove anything confidential, and steer from there. They work in ChatGPT, Copilot, or any assistant.</p></div></div>
+  <div class="sh"><span class="no">09</span><div><h2>Prompts to keep.</h2><p>Starting points for common shop tasks. Fill in the brackets, remove anything confidential, and steer from there. They work in ChatGPT, Copilot, or any assistant.</p></div></div>
   <div class="body kit">
     <div class="kitItem"><h3>Toolbox talk</h3><p class="use">Safety and training</p>
 <div class="prompt" data-mode="new">Write a five-minute toolbox talk on [topic] for [type of crew] at a [type of manufacturing] shop. Plain language, one real-world example, and three questions to ask the crew at the end. Don't invent statistics.</div></div>
