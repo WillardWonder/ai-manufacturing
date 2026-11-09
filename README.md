@@ -4,6 +4,7 @@ A plain-language overview site for a lecture audience: what AI is, the tools, wh
 
 Live at https://willardwonder.github.io/ai-manufacturing/
 
-- `index.html`: the overview
+- `index.html`: the reference page (take-home)
+- `present.html`: full-screen slide deck for the talk (arrow keys or clicker, F for full screen)
 - `handout.html`: one-page take-home sheet with QR code
 - `assets/`: styles, script, QR code. No build step.

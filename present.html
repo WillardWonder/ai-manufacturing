@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI for Manufacturers: Presentation</title>
+<meta name="theme-color" content="#0E1114">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--steel:#E6E9EC;--black:#0E1114;--graphite:#1B2026;--gray:#5B6470;--line:#C6CCD3;--yellow:#FFC20E;--yellow-soft:#FFF3C4;--red:#C8102E;--green:#1E7A4C;--blue:#1F5FBF;
+--head:"Barlow Condensed","Arial Narrow",sans-serif;--sans:"Barlow",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.stage{position:fixed;inset:0;display:grid;place-items:center}
+.deck{width:1920px;height:1080px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;display:none;padding:110px 140px;overflow:hidden;background:var(--steel);color:var(--black)}
+.slide.on{display:flex;flex-direction:column;animation:in .35s ease}
+@keyframes in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
+.slide.dark{background:var(--black);color:#fff}
+.slide.yel{background:var(--yellow);color:var(--black)}
+.slide.center{justify-content:center}
+h1,h2,h3{margin:0;font-family:var(--head);font-weight:700;line-height:.95;letter-spacing:-.005em}
+p{margin:0}
+.k{font-family:var(--mono);font-size:30px;color:var(--gray);margin-bottom:36px}
+.dark .k{color:var(--yellow)}
+.yel .k{color:var(--black)}
+.t1{font-size:190px;line-height:.86}
+.t2{font-size:132px;line-height:.9}
+.t3{font-size:96px;line-height:.95}
+.y{color:var(--yellow)}
+.sub{font-size:48px;line-height:1.3;margin-top:44px;max-width:1500px;color:inherit;opacity:.85}
+.stripe{position:absolute;left:0;right:0;bottom:0;height:56px;background:repeating-linear-gradient(-45deg,var(--yellow) 0 44px,var(--black) 44px 88px)}
+.sec{position:absolute;top:110px;right:140px;font-family:var(--head);font-weight:700;font-size:40px;background:var(--yellow);color:var(--black);padding:10px 22px 6px}
+.dark .sec{background:var(--yellow)}
+.yel .sec{background:var(--black);color:var(--yellow)}
+.rows{display:grid;gap:26px;margin-top:56px}
+.row{display:grid;grid-template-columns:24px 1fr;gap:36px;align-items:start;font-size:60px;font-family:var(--head);font-weight:700;line-height:1.05}
+.row::before{content:"";width:24px;height:100%;background:var(--yellow)}
+.row span{display:block;font-family:var(--sans);font-weight:400;font-size:38px;opacity:.7;margin-top:8px}
+.quote{font-size:52px;line-height:1.38;font-style:italic;max-width:1640px;margin-top:20px;border-left:16px solid var(--yellow);padding-left:48px}
+.code{background:var(--black);color:#E9EDF2;border-left:16px solid var(--yellow);font-family:var(--mono);font-size:40px;line-height:1.5;padding:40px 48px;white-space:pre-wrap;margin-top:28px}
+.out{background:#fff;border:3px solid var(--line);font-family:var(--sans);font-size:38px;line-height:1.45;padding:36px 44px;white-space:pre-wrap;margin-top:28px}
+.out.bad{background:#FBE9EC;border-color:#E9B8C0}
+.callout{margin-top:auto;font-size:44px;line-height:1.3;border-left:16px solid var(--yellow);padding-left:40px}
+.callout.red{border-color:var(--red)}
+.callout b{font-family:var(--head);font-weight:700;font-size:56px;display:block;line-height:1}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:56px;margin-top:40px;flex:1;min-height:0}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:36px;margin-top:48px}
+.four{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;margin-top:56px}
+.box{background:#fff;border-top:14px solid var(--black);padding:36px 36px 32px}
+.dark .box{background:var(--graphite);border-top-color:var(--yellow);color:#fff}
+.box .lb{font-family:var(--mono);font-size:26px;color:var(--gray);display:block;margin-bottom:16px}
+.dark .box .lb{color:var(--yellow)}
+.box h3{font-size:68px;margin-bottom:16px}
+.box p{font-size:34px;line-height:1.35}
+.box.hl{border:6px solid var(--yellow);border-top-width:14px}
+.list{list-style:none;padding:0;margin:0}
+.list li{font-size:44px;line-height:1.25;padding:20px 0;border-top:3px solid rgba(0,0,0,.12)}
+.dark .list li{border-color:rgba(255,255,255,.14)}
+.no-box{background:var(--black);color:#fff;border-top:14px solid var(--red);padding:40px 48px}
+.yes-box{background:#fff;border-top:14px solid var(--green);padding:40px 48px}
+.no-box h3,.yes-box h3{font-size:80px;margin-bottom:20px}
+.ladder{margin-top:40px;border-top:6px solid var(--black)}
+.rung{display:grid;grid-template-columns:420px 1fr 440px;gap:44px;align-items:center;padding:20px 0;border-bottom:3px solid var(--line)}
+.rung .s{font-family:var(--mono);font-size:26px;color:var(--gray)}
+.rung h3{font-size:54px}
+.rung p{font-size:31px;line-height:1.3}
+.rung .pr{font-family:var(--head);font-weight:700;font-size:52px;line-height:1}
+.rung .pr small{display:block;font-family:var(--sans);font-weight:400;font-size:26px;color:var(--gray);margin-top:8px;line-height:1.25}
+.steps{list-style:none;padding:0;margin:48px 0 0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:120px 1fr;gap:32px;align-items:baseline;padding:22px 0;border-top:3px solid var(--line);font-family:var(--head);font-weight:700;font-size:72px;line-height:1}
+.steps li::before{content:counter(s);color:var(--black);background:var(--yellow);text-align:center;font-size:64px;padding:8px 0 4px}
+.steps li span{display:block;font-family:var(--sans);font-weight:400;font-size:34px;color:var(--gray);margin-top:10px;line-height:1.25}
+.compact .box{padding:26px 30px 24px}.compact .box h3{font-size:52px;margin-bottom:12px}.compact .box p{font-size:29px;line-height:1.3}.compact .box .lb{font-size:22px;margin-bottom:10px}
+.qrbig{display:flex;gap:80px;align-items:center;margin-top:60px}
+.qrbig img{width:400px;height:400px;background:#fff;padding:24px}
+.qrbig p{font-family:var(--mono);font-size:44px;color:var(--yellow);line-height:1.4}
+.bowl{display:flex;gap:28px;margin-top:56px}
+.bowl div{flex:1;aspect-ratio:1;background:#fff;border:3px solid var(--line);display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:40px;color:var(--gray);text-align:center;padding:20px}
+/* chrome */
+.hud{position:fixed;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.12);z-index:5}
+.hud i{display:block;height:100%;background:var(--yellow);width:0;transition:width .3s}
+.ctrl{position:fixed;right:18px;bottom:18px;display:flex;gap:8px;align-items:center;z-index:6;font-family:var(--mono);font-size:13px;color:#fff;opacity:0;transition:opacity .3s}
+.ctrl.show{opacity:1}
+.ctrl button,.ctrl a{background:rgba(14,17,20,.85);color:#fff;border:1px solid rgba(255,255,255,.25);padding:8px 12px;cursor:pointer;font:inherit;text-decoration:none}
+.ctrl button:hover,.ctrl a:hover{border-color:var(--yellow);color:var(--yellow)}
+.ctrl span{background:rgba(14,17,20,.85);padding:8px 12px}
+.help{position:fixed;inset:0;background:rgba(0,0,0,.85);color:#fff;z-index:10;display:none;place-items:center;font-family:var(--sans);font-size:20px}
+.help.on{display:grid}
+.help div{background:var(--graphite);border-top:8px solid var(--yellow);padding:32px 40px;line-height:1.9}
+.help b{font-family:var(--mono);color:var(--yellow);display:inline-block;min-width:200px}
+</style>
+</head>
+<body>
+<div class="stage"><div class="deck" id="deck">
+
+<!-- 1 title -->
+<section class="slide dark">
+  <p class="k">AI for Manufacturers, with Josh Stutting</p>
+  <h1 class="t1">AI won't run your plant.<br><span class="y">It can take a lot<br>off your plate.</span></h1>
+  <div class="stripe"></div>
+</section>
+
+<!-- 2 problems -->
+<section class="slide">
+  <p class="k">Sound familiar?</p>
+  <div class="rows">
+    <div class="row"><div>Your best people are retiring.<span>And what they know was never written down.</span></div></div>
+    <div class="row"><div>You're short-staffed.<span>The paperwork didn't get the memo.</span></div></div>
+    <div class="row"><div>Training takes forever.<span>New hires learn by shadowing whoever has time.</span></div></div>
+    <div class="row"><div>Everyone says "AI."<span>Nobody says what it actually does for a shop like yours.</span></div></div>
+  </div>
+</section>
+
+<!-- 3 promise -->
+<section class="slide yel center">
+  <h2 class="t2">AI won't fix your equipment.</h2>
+  <p class="sub" style="font-family:var(--head);font-weight:700;font-size:96px;line-height:1;opacity:1;margin-top:30px">It's very good at the paperwork around the work.</p>
+</section>
+
+<!-- 4 meet dale -->
+<section class="slide dark center">
+  <span class="sec">Watch it work</span>
+  <p class="k">Every shop has one</p>
+  <h2 class="t1">Meet Dale.</h2>
+  <p class="sub">31 years on Press 4. The only one who really knows the die change. Retiring in two years.</p>
+</section>
+
+<!-- 5 voice memo -->
+<section class="slide">
+  <span class="sec">Watch it work</span>
+  <p class="k">Dale's voice memo, word for word</p>
+  <p class="quote">"First thing, you lock it out, main disconnect and the air. Run the slide down to bottom dead center before I pull anything. Pull the old die, use the cart, not the forklift. Clean the bolster, really clean it. Set the new die, line up the pins, snug the clamps, then torque them. There's a number on the sheet in the office. Check shut height, every time. Inch it through, run one part, call quality before you run."</p>
+  <p class="callout"><b>This part isn't AI.</b>The knowledge comes from a person. Recorded on a phone, transcribed for free.</p>
+</section>
+
+<!-- 6 vague -->
+<section class="slide">
+  <span class="sec">Watch it work</span>
+  <p class="k">Ask vaguely</p>
+  <div class="code">Write an SOP for a die change.</div>
+  <div class="out bad">Purpose: This procedure ensures safe and efficient die changes in accordance with company standards… Remove the die using appropriate lifting equipment…</div>
+  <p class="callout red"><b>It filled in every blank.</b>None of it is Dale's. "Appropriate lifting equipment"? Dale said use the cart, never the forklift.</p>
+</section>
+
+<!-- 7 context -->
+<section class="slide">
+  <span class="sec">Watch it work</span>
+  <p class="k">Give it the context only you have</p>
+  <div class="code">Turn the transcript into a one-page work instruction for the Press 4 die change.
+<span style="color:#FFC20E">Who it's for:</span> operators with less than a year of experience. Some read English as a second language.
+<span style="color:#FFC20E">Format:</span> numbered steps, one action each. Safety steps first.
+<span style="color:#FFC20E">Rules:</span> Use only what's in the transcript. If something is missing, list it as a question. Don't guess.</div>
+  <p class="callout"><b>No magic words.</b>Who it's for. What it should look like. What it can't do.</p>
+</section>
+
+<!-- 8 draft -->
+<section class="slide">
+  <span class="sec">Watch it work</span>
+  <p class="k">What came back</p>
+  <div class="two" style="margin-top:0">
+    <div class="out" style="margin-top:0;font-size:33px">SAFETY 1. Lock out main disconnect and air.
+SAFETY 2. Slide to bottom dead center.
+3. Remove old die with the cart. No forklift.
+4. Clean the bolster completely.
+5. Set new die. Line up locating pins.
+6. Snug clamps, then torque to the setup sheet.
+7. Check shut height before cycling.
+8. Inch through one full stroke.
+9. Run one part. Call Quality for first article.</div>
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="box" style="border-top-color:var(--yellow)"><span class="lb">Questions for the supervisor</span><p>What is the clamp torque value?</p><p style="margin-top:14px">What is the shut height for each die?</p><p style="margin-top:14px">Does lockout include hydraulic or stored pressure?</p></div>
+      <p class="callout" style="margin-top:0"><b>Every step is Dale's.</b>The gaps became questions, not guesses.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 three pieces -->
+<section class="slide">
+  <span class="sec">Watch it work</span>
+  <p class="k">Same conversation, two more requests</p>
+  <h2 class="t3">One conversation. Three useful pieces.</h2>
+  <div class="three">
+    <div class="box"><span class="lb">01</span><h3>Work instruction</h3><p>One page, safety first, in Dale's words.</p></div>
+    <div class="box"><span class="lb">02</span><h3>Spanish version</h3><p>Checked by a fluent speaker before it's posted.</p></div>
+    <div class="box"><span class="lb">03</span><h3>Training check</h3><p>Five questions a supervisor uses to confirm a new operator gets it.</p></div>
+  </div>
+</section>
+
+<!-- 10 sign off -->
+<section class="slide dark center">
+  <span class="sec">Watch it work</span>
+  <h2 class="t2">A person checks it, finishes it, and signs it.</h2>
+  <p class="sub">The time moves from writing to reviewing. The knowledge stays Dale's. The sign-off stays human.</p>
+</section>
+
+<!-- 11 built section -->
+<section class="slide yel center">
+  <span class="sec">Built with AI</span>
+  <h2 class="t1">Real tools.<br>No software team.</h2>
+  <p class="sub" style="opacity:1">Every one started as a plain description of a problem.</p>
+</section>
+
+<!-- 12 shoes -->
+<section class="slide dark">
+  <span class="sec">Built with AI</span>
+  <p class="k">In the room today</p>
+  <h2 class="t1">MatWalker.</h2>
+  <p class="sub">A new line of wrestling and training shoes, taken from idea to a product site you can put in front of buyers, partners, and investors.</p>
+  <p class="callout" style="color:#fff"><b>Pass them around.</b>The product is real. AI helped tell its story and build the site.</p>
+</section>
+
+<!-- 13 tools grid -->
+<section class="slide">
+  <span class="sec">Built with AI</span>
+  <p class="k">Small businesses, real work</p>
+  <div class="three compact" style="margin-top:10px">
+    <div class="box"><span class="lb">Small product business</span><h3>Trapping supplies</h3><p>A family business selling its own product, The Egg Cover. Built without a web firm.</p></div>
+    <div class="box"><span class="lb">Fabricator</span><h3>Countertop shop website</h3><p>Services, materials, process, contact. The site small shops put off for years.</p></div>
+    <div class="box"><span class="lb">Operations</span><h3>Inventory tracker</h3><p>SKU, location, minimum stock, total value. Replaces the spreadsheet nobody trusts.</p></div>
+    <div class="box"><span class="lb">Logistics</span><h3>Fleet dispatch</h3><p>Drivers, trailers, pickup windows, routes, and live driver progress for a hauling business.</p></div>
+    <div class="box"><span class="lb">Valuation</span><h3>Land evaluator</h3><p>How easements, wetlands, and slope cut usable acres, with evidence for every number.</p></div>
+    <div class="box hl"><span class="lb">Your shop</span><h3>What's yours?</h3><p>Scrap calculator. Changeover timer. Quote estimator. New-hire quiz.</p></div>
+  </div>
+</section>
+
+<!-- 14 prototype -->
+<section class="slide dark center">
+  <h2 class="t2">If you can describe the problem, <span class="y">AI can build a first version.</span></h2>
+  <p class="sub">A prototype isn't a finished system. Someone still owns it, tests it, and keeps it accurate.</p>
+</section>
+
+<!-- 15 what section -->
+<section class="slide">
+  <span class="sec">What AI is</span>
+  <p class="k">"AI" means four different things</p>
+  <div class="four">
+    <div class="box"><span class="lb">Reads and writes</span><h3>Assistants</h3><p>Writes, summarizes, translates, analyzes. Dale's work instruction.</p></div>
+    <div class="box"><span class="lb">Learns from data</span><h3>Predictive</h3><p>Forecasts from sensor or sales data. A bearing before it fails.</p></div>
+    <div class="box"><span class="lb">Sees</span><h3>Vision</h3><p>Cameras that spot defects, count parts, read labels.</p></div>
+    <div class="box"><span class="lb">Does</span><h3>Automation</h3><p>Robots and bots. Many aren't AI at all.</p></div>
+  </div>
+  <p class="callout"><b>Ask which one.</b>Most of what you can use tomorrow, with no new equipment, is the first kind.</p>
+</section>
+
+<!-- 16 predicts -->
+<section class="slide dark center">
+  <span class="sec">What AI is</span>
+  <h2 class="t1">It predicts.<br><span class="y">It doesn't know.</span></h2>
+  <p class="sub">It writes the most likely next words. Likely isn't the same as true, and it isn't the same as your shop's way.</p>
+</section>
+
+<!-- 17 bowl -->
+<section class="slide">
+  <span class="sec">What AI is</span>
+  <p class="k">Ask a room to make "a bowl of fruit"</p>
+  <h2 class="t2">It fills in what you leave blank.</h2>
+  <div class="bowl"><div>Wooden bowl<br>apples, grapes,<br>banana</div><div>White bowl<br>apples, grapes,<br>banana</div><div>Wooden bowl<br>apples, grapes,<br>orange</div><div>Glass bowl<br>apples, grapes,<br>banana</div></div>
+  <p class="callout"><b>Vague in, generic out.</b>Every decision you skip, it makes for you.</p>
+</section>
+
+<!-- 18 cost -->
+<section class="slide">
+  <span class="sec">Tools and cost</span>
+  <p class="k">Start at the top. Move down only when a real need shows up.</p>
+  <div class="ladder">
+    <div class="rung"><div><span class="s">Start here</span><h3>General assistants</h3></div><p>ChatGPT, Microsoft Copilot, Google Gemini, Claude</p><div class="pr">Free to $20–25<small>per person per month, business plans</small></div></div>
+    <div class="rung"><div><span class="s">Next</span><h3>AI in your software</h3></div><p>Microsoft 365 Copilot, ERP, quality, and maintenance add-ons</p><div class="pr">$21–30<small>per person per month, on top of Microsoft 365</small></div></div>
+    <div class="rung"><div><span class="s">Custom</span><h3>Built for your shop</h3></div><p>Assistants with your SOPs, small tools like the ones you just saw</p><div class="pr">Mostly time<small>plus someone who owns it</small></div></div>
+    <div class="rung"><div><span class="s">Biggest lift</span><h3>Industrial systems</h3></div><p>Vision inspection, predictive maintenance, forecasting</p><div class="pr">A real project<small>budget, integration, clean data, pilot</small></div></div>
+  </div>
+  <p style="font-size:24px;color:var(--gray);margin-top:20px">US list prices, November 2026. Check before you buy. Names are examples, not endorsements.</p>
+</section>
+
+<!-- 19 uses -->
+<section class="slide">
+  <span class="sec">Where it helps</span>
+  <p class="k">The paperwork around the work</p>
+  <div class="three" style="margin-top:20px">
+    <div class="box"><h3>Production</h3><p>Work instructions, shift handoffs, changeover checklists</p></div>
+    <div class="box"><h3>Quality</h3><p>8D drafts, 5 Whys, nonconformance trends</p></div>
+    <div class="box"><h3>Maintenance</h3><p>Troubleshooting guides, PM checklists, work order history</p></div>
+    <div class="box"><h3>Sales and office</h3><p>Quote replies, spec summaries, capability sheets</p></div>
+    <div class="box"><h3>Purchasing</h3><p>Supplier comparisons, contract summaries, lead times</p></div>
+    <div class="box"><h3>Safety and HR</h3><p>Toolbox talks, job postings, quizzes, translations</p></div>
+  </div>
+</section>
+
+<!-- 20 drafts -->
+<section class="slide yel center">
+  <h2 class="t1">AI drafts.<br>People decide.</h2>
+</section>
+
+<!-- 21 guardrails -->
+<section class="slide">
+  <span class="sec">Guardrails</span>
+  <p class="k">Most problems come from what goes in, and what nobody checks</p>
+  <div class="two">
+    <div class="no-box"><h3>Don't paste in</h3><ul class="list"><li>Customer drawings or pricing under NDA</li><li>Export-controlled data</li><li>Employee personal or medical info</li><li>Passwords and system access</li></ul></div>
+    <div class="yes-box"><h3>Always check</h3><ul class="list"><li>Every number: torque, tolerances, quantities</li><li>Every safety step</li><li>Names, dates, part numbers, sources</li><li>Translations, with a fluent speaker</li></ul></div>
+  </div>
+</section>
+
+<!-- 22 stranger -->
+<section class="slide dark center">
+  <span class="sec">Guardrails</span>
+  <h2 class="t2">If you wouldn't email it to a stranger, <span class="y">don't paste it in.</span></h2>
+  <p class="sub">Free accounts may use your conversations unless you change the settings. Business plans generally protect more. Read the terms.</p>
+</section>
+
+<!-- 23 one page rule -->
+<section class="slide">
+  <span class="sec">Guardrails</span>
+  <p class="k">You don't need a 30-page policy to start</p>
+  <h2 class="t2">One page covers most of the risk.</h2>
+  <div class="three">
+    <div class="box"><span class="lb">01</span><h3>Which tools</h3><p>The tools people are allowed to use.</p></div>
+    <div class="box"><span class="lb">02</span><h3>What never goes in</h3><p>The data that stays inside, no exceptions.</p></div>
+    <div class="box"><span class="lb">03</span><h3>Who signs off</h3><p>A person reviews anything that leaves the building.</p></div>
+  </div>
+</section>
+
+<!-- 24 habits -->
+<section class="slide">
+  <span class="sec">Getting good results</span>
+  <p class="k">Four habits. You saw all of them with Dale.</p>
+  <div class="four">
+    <div class="box"><span class="lb">01</span><h3>Know what finished looks like</h3><p>Who uses it, and what can they do with it?</p></div>
+    <div class="box"><span class="lb">02</span><h3>Give it your context</h3><p>Who it's for, the format, your sources, your rules.</p></div>
+    <div class="box"><span class="lb">03</span><h3>Steer it</h3><p>"Keep this, change that." "What are you assuming?"</p></div>
+    <div class="box"><span class="lb">04</span><h3>Watch where it's going</h3><p>Check it against what you set out to do.</p></div>
+  </div>
+</section>
+
+<!-- 25 gps -->
+<section class="slide dark center">
+  <p class="k">A GPS reroutes you, but keeps your destination. AI can quietly change both.</p>
+  <h2 class="t1">AI can find the route.<br><span class="y">You own the destination.</span></h2>
+</section>
+
+<!-- 26 monday -->
+<section class="slide">
+  <span class="sec">Start Monday</span>
+  <ol class="steps">
+    <li><div>Pick one annoying task.<span>Repeated, written, time-consuming.</span></div></li>
+    <li><div>Write down what finished looks like.<span>Who uses it, and what they'll be able to do.</span></div></li>
+    <li><div>Try it with non-sensitive material.<span>A general assistant and the four habits.</span></div></li>
+    <li><div>Compare it honestly.<span>Faster? As good once a person reviewed it?</span></div></li>
+    <li><div>Share it, and write the rule.<span>Save the prompt. Show a coworker. One-page guardrails.</span></div></li>
+  </ol>
+</section>
+
+<!-- 27 close -->
+<section class="slide dark">
+  <h2 class="t2">AI won't replace the people who know how your shop runs.</h2>
+  <p class="sub" style="font-family:var(--head);font-weight:700;font-size:80px;opacity:1;color:var(--yellow);line-height:1">It can make sure what they know gets used.</p>
+  <div class="stripe"></div>
+</section>
+
+<!-- 28 qr -->
+<section class="slide dark">
+  <p class="k">Keep everything from today</p>
+  <h2 class="t2">Every example, every prompt, the take-home sheet.</h2>
+  <div class="qrbig"><img src="assets/qr.svg" alt="QR code linking to the site"><p>willardwonder.github.io/<br>ai-manufacturing</p></div>
+</section>
+
+</div></div>
+
+<div class="hud"><i id="bar"></i></div>
+<div class="ctrl" id="ctrl"><button type="button" id="pv" aria-label="Previous slide">◀</button><span id="ct"></span><button type="button" id="nx" aria-label="Next slide">▶</button><button type="button" id="fs">Full screen</button><button type="button" id="hp">Keys</button><a href="index.html">Exit</a></div>
+<div class="help" id="help" role="dialog" aria-label="Keyboard shortcuts"><div>
+<b>→  Space  PgDn</b> Next slide<br><b>←  PgUp</b> Previous slide<br><b>Home / End</b> First / last slide<br><b>F</b> Full screen<br><b>Click</b> Right side next, left side back<br><b>Esc</b> Close this help</div></div>
+
+<script>
+(function(){
+"use strict";
+var deck=document.getElementById("deck"),slides=[].slice.call(deck.querySelectorAll(".slide")),n=slides.length,i=0;
+function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);deck.style.transform="scale("+s+")"}
+function go(k,push){i=Math.max(0,Math.min(n-1,k));slides.forEach(function(s,j){s.classList.toggle("on",j===i)});
+  document.getElementById("bar").style.width=((i+1)/n*100)+"%";document.getElementById("ct").textContent=(i+1)+" / "+n;
+  if(push!==false)history.replaceState(null,"","#"+(i+1))}
+function next(){go(i+1)}function prev(){go(i-1)}
+function fsToggle(){if(document.fullscreenElement)document.exitFullscreen();else if(document.documentElement.requestFullscreen)document.documentElement.requestFullscreen()}
+var help=document.getElementById("help");
+document.addEventListener("keydown",function(e){
+  if(help.classList.contains("on")&&e.key!=="Escape")return;
+  switch(e.key){
+    case "ArrowRight":case "PageDown":case " ":case "Enter":e.preventDefault();next();break;
+    case "ArrowLeft":case "PageUp":case "Backspace":e.preventDefault();prev();break;
+    case "Home":go(0);break;case "End":go(n-1);break;
+    case "f":case "F":fsToggle();break;
+    case "Escape":help.classList.remove("on");break;
+    case "?":help.classList.toggle("on");break;
+  }});
+document.querySelector(".stage").addEventListener("click",function(e){if(e.clientX>window.innerWidth/3)next();else prev()});
+var tx=null;document.addEventListener("touchstart",function(e){tx=e.touches[0].clientX},{passive:true});
+document.addEventListener("touchend",function(e){if(tx===null)return;var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50){d<0?next():prev()}tx=null});
+document.getElementById("pv").addEventListener("click",prev);document.getElementById("nx").addEventListener("click",next);
+document.getElementById("fs").addEventListener("click",fsToggle);
+document.getElementById("hp").addEventListener("click",function(){help.classList.add("on")});
+help.addEventListener("click",function(){help.classList.remove("on")});
+var ctrl=document.getElementById("ctrl"),hideT;
+function showCtrl(){ctrl.classList.add("show");document.body.style.cursor="";clearTimeout(hideT);hideT=setTimeout(function(){ctrl.classList.remove("show");document.body.style.cursor="none"},2500)}
+document.addEventListener("mousemove",showCtrl);
+window.addEventListener("resize",fit);
+window.addEventListener("hashchange",function(){var h=parseInt(location.hash.slice(1),10);if(h)go(h-1,false)});
+fit();var h=parseInt(location.hash.slice(1),10);go(h?h-1:0,false);showCtrl();
+})();
+</script>
+</body>
+</html>
