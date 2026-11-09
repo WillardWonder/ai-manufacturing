@@ -15,6 +15,8 @@ function copyText(text,btn,label){
 
 /* prompt panels: data-mode="new" (open in ChatGPT) | "same" (copy only) | "show" (display only, for the demo) */
 var CHAT="https://chatgpt.com/";
+var TOUCH=window.matchMedia&&matchMedia("(pointer:coarse)").matches, MAC=/Mac|iPhone|iPad/.test(navigator.platform||navigator.userAgent);
+var PASTE=TOUCH?"Press and hold, then tap Paste":(MAC?"Press ⌘V":"Press Ctrl+V");
 var WHERE={new:"Opens in ChatGPT with the prompt filled in. Works in Copilot too: copy and paste.",same:"A follow-up: copy it, then paste it into the chat you already have open",show:"What was typed"};
 $$(".prompt").forEach(function(el){
   var mode=el.getAttribute("data-mode")||"new",text=el.textContent.replace(/^\s*\n/,"").replace(/\s+$/,"");
@@ -23,7 +25,7 @@ $$(".prompt").forEach(function(el){
   var bar=document.createElement("div");bar.className="pbar";bar.innerHTML='<span class="where">'+WHERE[mode]+'</span>';
   if(mode==="new"){var a=document.createElement("a");a.className="pbtn go";a.target="_blank";a.rel="noopener";a.textContent="Open in ChatGPT";a.href=CHAT+"?q="+encodeURIComponent(text);bar.appendChild(a)}
   var c=document.createElement("button");c.type="button";c.className="pbtn";c.textContent="Copy";
-  c.addEventListener("click",function(){copyText(text,c,"Copy")});bar.appendChild(c);
+  c.addEventListener("click",function(){var r=copyText(text,c,"Copy");if(r&&r.then)r.then(function(){toast("Copied. "+PASTE+" in ChatGPT or Copilot.")})});bar.appendChild(c);
   el.appendChild(bar);
 });
 
@@ -49,4 +51,8 @@ function spy(){var y=window.scrollY+window.innerHeight*.3,cur=0;secs.forEach(fun
   links.forEach(function(a,k){a.classList.toggle("active",k===cur)});
   var r=$(".navlist"),act=links[cur];if(r&&act){var l=act.offsetLeft-r.clientWidth/2+act.clientWidth/2;if(Math.abs(r.scrollLeft-l)>40)r.scrollLeft=l}}
 window.addEventListener("scroll",spy,{passive:true});spy();
+/* reading progress */
+(function(){var b=document.createElement("div");b.className="progress";b.setAttribute("aria-hidden","true");document.body.appendChild(b);
+  var raf;function upd(){raf=0;var h=document.documentElement,m=h.scrollHeight-h.clientHeight;b.style.transform="scaleX("+(m>0?h.scrollTop/m:0)+")"}
+  window.addEventListener("scroll",function(){if(!raf)raf=requestAnimationFrame(upd)},{passive:true});upd()})();
 })();

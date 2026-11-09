@@ -196,6 +196,7 @@ footer.site{background:var(--black);color:rgba(255,255,255,.6);font-size:14px;pa
 footer.site .in{max-width:var(--wide);margin:0 auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140px);background:var(--black);color:#fff;border-left:6px solid var(--yellow);font-size:16px;padding:12px 20px;z-index:60;transition:transform .3s;max-width:90vw}
 .toast.on{transform:translate(-50%,0)}
+.progress{position:fixed;left:0;top:0;height:4px;width:100%;background:var(--yellow);transform-origin:0 50%;transform:scaleX(0);z-index:70;pointer-events:none}
 
 @media (max-width:1000px){
   .hero .in{grid-template-columns:1fr}
@@ -211,5 +212,12 @@ footer.site .in{max-width:var(--wide);margin:0 auto;display:flex;justify-content
   .sec{padding-top:64px}
   .sh{grid-template-columns:1fr;gap:12px}.sh .no{justify-self:start}
   .demoBody{padding:22px 18px}.demoNav{padding:14px 18px}
-  .present{font-size:16px;padding:7px 12px}
+  .present{font-size:16px;padding:7px 12px;min-height:44px;display:inline-flex;align-items:center}
+  .pbar{flex-wrap:wrap;gap:10px}
+  .pbar .where{flex-basis:100%}
+  .pbtn{min-height:48px;padding:12px 18px;font-size:17px;display:inline-flex;align-items:center;justify-content:center}
+  .pbtn.go{flex:1 1 auto}
+  .btn{min-height:46px}
+  .navlist a{min-height:44px;display:inline-flex;align-items:center}
+  .toast{bottom:16px;font-size:16px;padding:14px 18px}
 }

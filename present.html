@@ -90,6 +90,7 @@ p{margin:0}
 .bowl div{flex:1;aspect-ratio:1;background:#fff;border:3px solid var(--line);display:grid;place-items:center;font-family:var(--head);font-weight:700;font-size:40px;color:var(--gray);text-align:center;padding:20px}
 /* chrome */
 .hud{position:fixed;left:0;right:0;bottom:0;height:6px;background:rgba(255,255,255,.12);z-index:5}
+.urlTag{position:fixed;left:18px;bottom:18px;z-index:5;font:600 clamp(11px,1.1vw,17px)/1 "IBM Plex Mono",monospace;color:rgba(255,255,255,.55);background:rgba(14,17,20,.6);padding:6px 10px;pointer-events:none}
 .hud i{display:block;height:100%;background:var(--yellow);width:0;transition:width .3s}
 .ctrl{position:fixed;right:18px;bottom:18px;display:flex;gap:8px;align-items:center;z-index:6;font-family:var(--mono);font-size:13px;color:#fff;opacity:0;transition:opacity .3s}
 .ctrl.show{opacity:1}
@@ -450,6 +451,7 @@ p{margin:0}
 </div></div>
 
 <div class="hud"><i id="bar"></i></div>
+<div class="urlTag" aria-hidden="true">willardwonder.github.io/ai-manufacturing</div>
 <div class="ctrl" id="ctrl"><button type="button" id="pv" aria-label="Previous slide">◀</button><span id="ct"></span><button type="button" id="nx" aria-label="Next slide">▶</button><button type="button" id="fs">Full screen</button><button type="button" id="hp">Keys</button><a href="index.html">Exit</a></div>
 <div class="help" id="help" role="dialog" aria-label="Keyboard shortcuts"><div>
 <b>→  Space  PgDn</b> Next slide<br><b>←  PgUp</b> Previous slide<br><b>Home / End</b> First / last slide<br><b>F</b> Full screen<br><b>Click</b> Right side next, left side back<br><b>Esc</b> Close this help</div></div>
