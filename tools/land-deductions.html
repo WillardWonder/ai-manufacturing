@@ -182,7 +182,7 @@
 <h3>1 · The parcel</h3><p class="hint">Use the unencumbered value of comparable land, not the asking price or assessed value.</p>
 <p class="demoNote" id="demoNote" hidden>Training example: the numbers are illustrative, not market data.</p>
 <div class="r2"><div class="field"><span class="lbl">Parcel name or ID</span><input class="in" id="pName" placeholder="e.g. 026-0582, Town of Rolling"/></div><div class="field"><span class="lbl">Total acres</span><input class="in" id="pAcres" inputmode="decimal" min="0" placeholder="e.g. 80" step="any" type="number"/></div></div>
-<div class="r2"><div class="field"><span class="lbl">Unencumbered value ($ per acre)</span><input class="in" id="pRate" inputmode="decimal" min="0" placeholder="From comparable sales" step="any" type="number"/></div><div class="field"><span class="lbl">Where that value came from</span><input class="in" id="pSource" placeholder="e.g. Parcel Scout comps median, 12 sales within 30 mi"/></div></div>
+<div class="r2"><div class="field"><span class="lbl">Unencumbered value ($ per acre)</span><input class="in" id="pRate" inputmode="decimal" min="0" placeholder="From comparable sales" step="any" type="number"/></div><div class="field"><span class="lbl">Where that value came from</span><input class="in" id="pSource" placeholder="e.g. median of 12 comparable sales within 30 mi"/></div></div>
 <div class="tipline" id="pWarn"></div>
 <h3 style="margin-top:14px">2 · The conditions</h3><p class="hint">Tap a condition to add it. Assign each acre to one condition only.</p>
 <div class="fpick" id="fpick"></div>
@@ -283,7 +283,7 @@ var F=[
  {k:"soil",icon:"🧪",n:"Soil limits: acidity, drainage, low productivity",g:"terrain",scope:"area",helper:"productivity",
   what:"Acid, poorly drained or droughty soils grow less timber and suit fewer uses. For timberland this shows up as lower site index and productivity.",
   measure:"Acres of limiting soil map units; productivity (ft³/ac/yr) and site index for the main species.",
-  where:A("https://websoilsurvey.nrcs.usda.gov/","USDA Web Soil Survey")+" (pH, drainage class, forest productivity). Parcel Scout shows drainage and site index per map unit.",
+  where:A("https://websoilsurvey.nrcs.usda.gov/","USDA Web Soil Survey")+" (pH, drainage class, forest productivity). The soil survey also shows drainage and site index per map unit.",
   evidence:"Comparable sales on similar soils; productivity compared with the soils under your comparable sales.",
   watch:"The most common double count. If your comparable sales sit on similar soils, or timber value already uses site index, do not deduct here."},
  {k:"contam",icon:"☣️",n:"Contamination, dumps or fill",g:"env",scope:"area",
@@ -316,13 +316,13 @@ var EVID=[["paired","Paired sales or market study"],["judgment","Appraiser or as
 
 /* ---------- state ---------- */
 var BLANK={name:"",acres:"",rate:"",source:"",factors:[]};
-var S=store.get("k3_deductions",null);if(!S||!Array.isArray(S.factors))S=JSON.parse(JSON.stringify(BLANK));
-var EXAMPLE={demo:true,name:"Training example: 80 acres, Langlade County",acres:"80",rate:"3800",source:"Illustrative for training (in practice: Parcel Scout comps median and the sales list)",
+var S=store.get("land_deductions",null);if(!S||!Array.isArray(S.factors))S=JSON.parse(JSON.stringify(BLANK));
+var EXAMPLE={demo:true,name:"Training example: 80 wooded acres, central Wisconsin",acres:"80",rate:"3800",source:"Illustrative for training (in practice: median of recent comparable sales)",
  factors:[{k:"utility",acres:"9.09",lo:"40",hi:"60",ev:"paired",note:"150 ft powerline corridor × 2,640 ft",w:"150",len:"2640"},
           {k:"wetland",acres:"12",lo:"50",hi:"75",ev:"judgment",note:"Wetland Inventory; no field delineation yet"},
           {k:"soil",acres:"6",lo:"10",hi:"20",ev:"none",note:"Poorly drained map unit",subj:"43",typ:"57"},
           {k:"minerals",acres:"",lo:"0",hi:"2",ev:"judgment",note:"Severed in 1950s deed; no mining activity in area"}]};
-function save(){store.set("k3_deductions",S)}
+function save(){store.set("land_deductions",S)}
 
 /* ---------- calculation (pure) ---------- */
 function calc(s){
@@ -402,7 +402,7 @@ function renderCards(){
     card.appendChild(el("div",{cls:"r2"},[fld("Evidence",ev),fld("Note or source",inp(f,"note","Document, map, sales used"))]));
     if(d.helper==="productivity"){
       var sj=inp(f,"subj","Subject ft³/ac/yr","number"),ty=inp(f,"typ","Comps' soils ft³/ac/yr","number"),out=el("div",{cls:"okline"});
-      var show=function(){var a=num(f.subj),b=num(f.typ);out.textContent=a&&b?"Productivity is "+Math.round(100*a/b)+"% of the soils under your comparable sales. This is evidence to weigh, not an automatic deduction.":"Optional: compare productivity with the soils under your comparable sales (Parcel Scout shows ft³/ac/yr)."};
+      var show=function(){var a=num(f.subj),b=num(f.typ);out.textContent=a&&b?"Productivity is "+Math.round(100*a/b)+"% of the soils under your comparable sales. This is evidence to weigh, not an automatic deduction.":"Optional: compare productivity with the soils under your comparable sales (the soil survey reports ft³/ac/yr)."};
       [sj,ty].forEach(function(i){i.addEventListener("input",show)});show();
       card.appendChild(el("div",{cls:"r2"},[fld("Subject productivity",sj),fld("Comparable soils",ty)]));card.appendChild(out);
     }
