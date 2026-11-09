@@ -15,7 +15,7 @@ function copyText(text,btn,label){
 
 /* prompt panels: data-mode="new" (open in ChatGPT) | "same" (copy only) | "show" (display only, for the demo) */
 var CHAT="https://chatgpt.com/";
-var WHERE={new:"Try it later in ChatGPT, Copilot, or any AI assistant",same:"A follow-up in the same conversation",show:"What was typed"};
+var WHERE={new:"Opens in ChatGPT with the prompt filled in. Works in Copilot too: copy and paste.",same:"A follow-up: copy it, then paste it into the chat you already have open",show:"What was typed"};
 $$(".prompt").forEach(function(el){
   var mode=el.getAttribute("data-mode")||"new",text=el.textContent.replace(/^\s*\n/,"").replace(/\s+$/,"");
   el.textContent="";el.classList.add(mode==="new"?"new":"same");
