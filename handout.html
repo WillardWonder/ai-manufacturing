@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Take-home sheet: AI for Manufacturers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400..700&family=Geist+Mono:wght@400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#EDF0F3;--ink:#0D1626;--muted:#5E6A7A;--line:#DDE2E9;--accent:#3050E0;--accent-soft:#E8ECFC;--gold:#B4893A;--gold-soft:#F6EEDD;
+--serif:"Instrument Serif",Georgia,serif;--sans:"Geist",system-ui,sans-serif;--mono:"Geist Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:12.5px;line-height:1.45;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-weight:400}
+p{margin:0 0 .45em}
+a{color:var(--accent)}
+.bar{max-width:8.5in;margin:0 auto;padding:22px 12px 0;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+.bar button{font-family:var(--sans);font-weight:500;font-size:15px;padding:9px 18px;border-radius:999px;border:0;background:var(--ink);color:#fff;cursor:pointer}
+.sheet{width:8.5in;max-width:calc(100% - 24px);margin:16px auto 28px;background:#fff;padding:.45in .5in;box-shadow:0 20px 50px -30px rgba(13,22,38,.5)}
+.head{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px}
+.head h1{font-family:var(--serif);font-size:36px;line-height:1}
+.head h1 em{display:block;font-size:20px;color:var(--muted)}
+.head .qr{display:flex;gap:10px;align-items:center;font-size:11px;color:var(--muted);text-align:right}
+.head .qr img{width:70px;height:70px}
+h2{font-family:var(--serif);font-size:19px;margin:0 0 5px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}
+ul{margin:0;padding-left:1.05em}
+li{margin-bottom:2px}
+.kinds{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kinds div{background:var(--accent-soft);border-radius:8px;padding:8px 9px;font-size:11.5px}
+.kinds b{display:block;font-family:var(--serif);font-weight:400;font-size:16px;color:var(--accent)}
+.pr{font-family:var(--mono);font-size:10.3px;line-height:1.42;background:#F3F5F9;border-left:3px solid var(--accent);padding:6px 8px;border-radius:0 6px 6px 0;margin:3px 0 6px}
+.no{background:var(--ink);color:#fff;border-radius:8px;padding:9px 11px}
+.no h2{color:#fff}
+.check{background:var(--gold-soft);border-radius:8px;padding:9px 11px}
+ol{margin:0;padding-left:1.2em}
+.foot{margin-top:12px;padding-top:8px;border-top:1px solid var(--line);font-size:10.5px;color:var(--muted);display:flex;justify-content:space-between}
+@media (max-width:760px){.sheet{padding:22px 16px}.cols,.kinds{grid-template-columns:1fr}.head{grid-template-columns:1fr}}
+@media print{@page{size:letter;margin:0}body{background:#fff}.bar{display:none}.sheet{margin:0;box-shadow:none;width:8.5in;max-width:none;height:11in;overflow:hidden}}
+</style>
+</head>
+<body>
+<div class="bar"><a href="index.html">Back to the overview</a><button type="button" onclick="window.print()">Print or save as PDF</button></div>
+<article class="sheet">
+  <div class="head">
+    <h1>AI for Manufacturers <em>AI won't run your plant. It can take a lot off your plate.</em></h1>
+    <div class="qr"><span>Every prompt, ready to copy:<br>willardwonder.github.io/ai-manufacturing</span><img src="assets/qr.svg" alt="QR code"></div>
+  </div>
+
+  <div class="kinds">
+    <div><b>AI assistants</b>Read and write. Drafts, summaries, translation, analysis.</div>
+    <div><b>Predictive AI</b>Learns from your data. Failures, demand, scrap.</div>
+    <div><b>Computer vision</b>Sees. Defects, counts, labels, missing parts.</div>
+    <div><b>Automation</b>Does. Robots and bots; AI helps them adapt.</div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h2>The tools, easiest first</h2>
+      <ol>
+        <li><b>General assistants:</b> ChatGPT, Microsoft Copilot, Google Gemini, Claude</li>
+        <li><b>AI in software you own:</b> Microsoft 365 Copilot, ERP, MES, and maintenance add-ons</li>
+        <li><b>Built for your shop:</b> custom assistants with your SOPs, small AI-built tools</li>
+        <li><b>Industrial systems:</b> vision inspection, predictive maintenance, forecasting</li>
+      </ol>
+      <h2 style="margin-top:10px">Good first uses</h2>
+      <ul>
+        <li><b>Production:</b> work instructions, shift handoffs, checklists</li>
+        <li><b>Quality:</b> 8D drafts, root-cause brainstorming, trend spotting</li>
+        <li><b>Maintenance:</b> troubleshooting guides, PM checklists</li>
+        <li><b>Front office:</b> quote replies, spec summaries</li>
+        <li><b>Purchasing:</b> supplier comparisons, contract summaries</li>
+        <li><b>Safety and HR:</b> toolbox talks, job posts, training quizzes</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Four habits for good results</h2>
+      <ol>
+        <li><b>Know what finished looks like.</b> Who uses it, and what they can do with it.</li>
+        <li><b>Give it context only you have.</b> Audience, format, source material, rules.</li>
+        <li><b>Steer it like a conversation.</b> "Keep this, change that." "What are you assuming?"</li>
+        <li><b>Watch where it's taking you.</b> AI can quietly change the destination.</li>
+      </ol>
+      <h2 style="margin-top:10px">Where to start</h2>
+      <ol>
+        <li>Pick one repeated, written, time-consuming task.</li>
+        <li>Write down what finished looks like.</li>
+        <li>Try it with non-sensitive material.</li>
+        <li>Compare it honestly to the old way.</li>
+        <li>Share what worked, and write a one-page rule.</li>
+      </ol>
+    </div>
+    <div class="no">
+      <h2>Don't paste in</h2>
+      <ul><li>Customer drawings, specs, or pricing under NDA</li><li>Export-controlled or defense-related data</li><li>Employee personal or medical information</li><li>Passwords or system access details</li></ul>
+    </div>
+    <div class="check">
+      <h2>Always check</h2>
+      <ul><li>Every number: dimensions, torque, tolerances</li><li>Every safety step, against your programs</li><li>Names, dates, part numbers, sources</li><li>Translations, with a fluent speaker</li></ul>
+    </div>
+  </div>
+
+  <h2 style="margin-top:12px">Try this: turn what one person knows into a work instruction</h2>
+  <div class="pr">Turn the transcript below into a one-page work instruction for [the job]. Who it's for: [who will use it and how experienced they are]. Format: numbered steps, one action per step, short sentences. Safety steps first, marked SAFETY. Rules: Use only what's in the transcript. Don't add steps that weren't said. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing. Transcript: [paste it here]</div>
+  <p>Record the expert on a phone, transcribe it, remove anything confidential, and paste it in. A person reviews and signs off before it goes on the floor.</p>
+
+  <div class="foot"><span>AI for Manufacturers. An overview with Josh Stutting.</span><span>Tool names are examples as of late 2026, not endorsements.</span></div>
+</article>
+</body>
+</html>

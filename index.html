@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI for Manufacturers</title>
+<meta name="description" content="A plain-language overview of AI for manufacturers: what it is, the tools, what it can do on and off the floor, and how to start safely.">
+<meta name="theme-color" content="#0D1626">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="in">
+    <div class="hbar">
+      <span class="mark"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l5 3V10l5 3V7l5 3V4h3v17z" stroke="#7F95FF"/><path d="M3 21h18" stroke="#fff"/></svg>AI for Manufacturers</span>
+      <span>An overview with Josh Stutting</span>
+    </div>
+    <div class="hgrid">
+      <div>
+        <h1>AI won't run your plant. <em>It can take a lot off your plate.</em></h1>
+        <p class="lede">A plain-language look at what AI actually is, which tools exist, where it helps on and off the shop floor, and how to start without putting your data, your customers, or your people at risk.</p>
+        <div class="ctas"><a class="btn light" href="#what">Start the overview</a><a class="btn line" href="handout.html">Take-home sheet</a></div>
+        <div class="qrBox"><img src="assets/qr.svg" alt="QR code linking to this page"><p><b>Keep this page.</b>Scan to save it. Every prompt here is ready to try when you're back at work.</p></div>
+      </div>
+      <svg class="routeArt" viewBox="0 0 440 330" role="img" aria-label="A production line drawn as a route, with AI helping at several stations">
+        <path class="road" d="M20 260 H420"/>
+        <path class="path draw" style="--len:900" d="M20 260 H80 V150 H160 V260 H220 V110 H300 V260 H360 V70 H420"/>
+        <g class="fadeIn">
+          <circle cx="120" cy="150" r="6" fill="#7F95FF"/><text x="120" y="135" text-anchor="middle">Quote</text>
+          <circle cx="260" cy="110" r="6" fill="#7F95FF"/><text x="260" y="95" text-anchor="middle">Instructions</text>
+          <circle cx="390" cy="70" r="6" fill="#7F95FF"/><text x="390" y="55" text-anchor="middle">Quality</text>
+          <text x="20" y="290">Office</text><text x="420" y="290" text-anchor="end">Shop floor</text>
+        </g>
+      </svg>
+    </div>
+    <div class="leave" aria-label="What you'll leave knowing">
+      <div><p class="k">You'll leave knowing</p><h3>What AI actually is</h3><p>The four kinds you'll hear about, and what each one is good at.</p></div>
+      <div><p class="k">&nbsp;</p><h3>Which tools exist</h3><p>From free assistants to AI built into the software you already pay for.</p></div>
+      <div><p class="k">&nbsp;</p><h3>Where it pays off</h3><p>Real uses in every department, and one worked example every shop can use.</p></div>
+      <div><p class="k">&nbsp;</p><h3>How to start safely</h3><p>What never to paste in, what to always check, and a simple first step.</p></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav class="nav" aria-label="Sections">
+  <div class="in">
+    <a class="mark" href="#" onclick="window.scrollTo({top:0});return false"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l5 3V10l5 3V7l5 3V4h3v17z" stroke="#3050E0"/><path d="M3 21h18" stroke="#0D1626"/></svg><span>AI for Manufacturers</span></a>
+    <ul class="navlist">
+      <li><a href="#what"><span>01</span>What it is</a></li>
+      <li><a href="#tools"><span>02</span>The tools</a></li>
+      <li><a href="#uses"><span>03</span>What it can do</a></li>
+      <li><a href="#watch"><span>04</span>Watch it work</a></li>
+      <li><a href="#method"><span>05</span>Getting good results</a></li>
+      <li><a href="#safe"><span>06</span>Guardrails</a></li>
+      <li><a href="#start"><span>07</span>Where to start</a></li>
+      <li><a href="#prompts"><span>08</span>Prompts to keep</a></li>
+    </ul>
+    <a class="taskBtn" href="handout.html" style="text-decoration:none">Take-home sheet</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= 01 WHAT ================= -->
+<section class="chapter" id="what">
+  <div class="opener"><div class="no">01</div><div><p class="part-of">The basics</p><h2>What AI actually is.</h2><p class="promise">"AI" gets used for four very different things. Knowing which one someone means is half the battle when a vendor comes calling.</p></div></div>
+  <div class="flow">
+    <div class="kinds">
+      <div class="kind"><span class="lbl">Reads and writes</span><h3>AI assistants</h3><p>Also called generative AI or large language models. You type or talk to it in plain English, and it writes, summarizes, translates, analyzes, and answers back.</p><p class="eg"><b>On the shop floor</b>Turning a veteran operator's explanation into a written work instruction.</p></div>
+      <div class="kind"><span class="lbl">Learns from your data</span><h3>Predictive AI</h3><p>Also called machine learning. It finds patterns in sensor, production, or sales data and uses them to forecast what comes next.</p><p class="eg"><b>On the shop floor</b>Flagging a spindle bearing that's starting to fail, before it fails.</p></div>
+      <div class="kind"><span class="lbl">Sees</span><h3>Computer vision</h3><p>Cameras paired with software trained to recognize what they're looking at.</p><p class="eg"><b>On the shop floor</b>Spotting surface defects, counting parts, reading labels, or checking for missing components at line speed.</p></div>
+      <div class="kind"><span class="lbl">Does</span><h3>Automation and robotics</h3><p>Robots, cobots, and software bots that follow rules. Many aren't AI at all. AI is what lets some of them handle variation instead of exact repetition.</p><p class="eg"><b>On the shop floor</b>A cobot that adjusts its pick when parts arrive slightly out of position.</p></div>
+    </div>
+    <p class="lead">Most of what you can use tomorrow, with no new equipment and no integration project, is the first kind: AI assistants. That's where the rest of this overview spends most of its time.</p>
+
+    <h3 class="statement">How an AI assistant works, in one minute.</h3>
+    <ul class="facts">
+      <li><span class="fn">1</span><div><h3>It predicts. It doesn't know.</h3><p>It writes the most likely next words based on patterns from an enormous amount of text. Most likely isn't the same as true, and it isn't the same as your shop's way of doing things.</p></div><div class="so"><b>So</b>It can sound confident and still be wrong. Check anything that matters.</div></li>
+      <li><span class="fn">2</span><div><h3>It fills in what you leave blank.</h3><p>Ask a room of people to have it draw "a bowl of fruit" and you get a room full of nearly identical, safe, generic bowls. Every decision you skip, it makes for you.</p></div><div class="so"><b>So</b>Vague requests get generic answers. Specific requests get useful ones.</div></li>
+      <li><span class="fn">3</span><div><h3>It only knows what you give it.</h3><p>It doesn't know your parts, your customers, your machines, or your procedures unless you tell it or attach them.</p></div><div class="so"><b>So</b>The quality of what you give it decides the quality of what you get.</div></li>
+    </ul>
+    <div class="remember"><h4>Remember</h4><ul><li>"AI" means four different things. Ask which one.</li><li>AI assistants predict. They don't know your shop until you tell them.</li></ul></div>
+  </div>
+</section>
+
+<!-- ================= 02 TOOLS ================= -->
+<section class="chapter" id="tools">
+  <div class="opener"><div class="no">02</div><div><p class="part-of">The landscape</p><h2>The tools, from easiest to biggest lift.</h2><p class="promise">You don't need to buy anything to start. Most shops should begin at the top of this list and only move down when a real need shows up.</p></div></div>
+  <div class="flow">
+    <ul class="tiers">
+      <li><div><span class="tl">Start here</span><h3>General AI assistants</h3></div><div>
+        <div class="names"><span>ChatGPT</span><span>Microsoft Copilot</span><span>Google Gemini</span><span>Claude</span></div>
+        <p>Chat-based assistants that write, summarize, translate, and analyze documents and spreadsheets you attach. Free versions exist; paid business plans add stronger data protections and admin controls.</p>
+        <p class="fit"><b>Cost and effort:</b> free to low monthly cost per person, nothing to install.</p></div></li>
+      <li><div><span class="tl">Next</span><h3>AI inside software you already own</h3></div><div>
+        <div class="names"><span>Microsoft 365 Copilot</span><span>ERP and MES add-ons</span><span>Maintenance software features</span></div>
+        <p>AI features built into Word, Excel, Outlook, and Teams, and increasingly into ERP, MES, quality, and maintenance systems. It works inside your own files and records.</p>
+        <p class="fit"><b>Cost and effort:</b> usually an add-on license. Ask your vendors what's included, what's coming, and what happens to your data.</p></div></li>
+      <li><div><span class="tl">Custom</span><h3>Assistants and small tools built for your shop</h3></div><div>
+        <div class="names"><span>Custom GPTs</span><span>Copilot agents</span><span>Small AI-built tools</span></div>
+        <p>An assistant loaded with your own SOPs, product specs, or style, so anyone can ask it questions. Or a simple calculator, tracker, or checklist that AI helps you build in an afternoon.</p>
+        <p class="fit"><b>Cost and effort:</b> low cost, some setup time, and someone who owns keeping it accurate.</p></div></li>
+      <li><div><span class="tl">Biggest lift</span><h3>Industrial AI systems</h3></div><div>
+        <div class="names"><span>Vision inspection</span><span>Predictive maintenance</span><span>Demand forecasting</span><span>Scheduling optimization</span></div>
+        <p>Purpose-built systems with cameras, sensors, and data connections to your equipment and records. Powerful when the problem is clear and the data is good.</p>
+        <p class="fit"><b>Cost and effort:</b> a real project with a budget, integration, clean data, and a pilot. Start with a specific problem, not with the technology.</p></div></li>
+    </ul>
+    <p class="hint">Product names and features change fast. These are examples as of late 2026, not endorsements.</p>
+    <div class="remember"><h4>Remember</h4><ul><li>Start with a general assistant and a real task.</li><li>Buy bigger systems to solve specific problems, not to "do AI."</li></ul></div>
+  </div>
+</section>
+
+<!-- ================= 03 USES ================= -->
+<section class="chapter" id="uses">
+  <div class="opener"><div class="no">03</div><div><p class="part-of">On and off the floor</p><h2>What it can do in your shop.</h2><p class="promise">The best early wins are tasks that are repeated, written, and eat hours: the paperwork around the work.</p></div></div>
+  <div class="flow">
+    <div class="depts">
+      <div class="dept"><h3>Production</h3><ul><li>Work instructions and SOPs from an expert's explanation</li><li>Shift handoff summaries from notes</li><li>Changeover and startup checklists</li></ul></div>
+      <div class="dept"><h3>Quality</h3><ul><li>First drafts of 8D and corrective action reports</li><li>Root-cause brainstorming with 5 Whys or fishbone</li><li>Spotting trends in a nonconformance spreadsheet</li></ul></div>
+      <div class="dept"><h3>Maintenance</h3><ul><li>Troubleshooting guides from equipment manuals</li><li>Preventive maintenance checklists</li><li>Summaries of work order history for a machine</li></ul></div>
+      <div class="dept"><h3>Sales and front office</h3><ul><li>First drafts of quote responses and RFQ replies</li><li>Summarizing long customer specs and emails</li><li>Product descriptions and capability sheets</li></ul></div>
+      <div class="dept"><h3>Purchasing and supply chain</h3><ul><li>Side-by-side supplier comparisons</li><li>Plain-language summaries of contract terms</li><li>Lead time and price analysis from a spreadsheet</li></ul></div>
+      <div class="dept"><h3>Safety, HR, and training</h3><ul><li>Toolbox talks and safety reminders</li><li>Job descriptions and interview questions</li><li>Training quizzes and translated instructions, checked by a fluent speaker</li></ul></div>
+    </div>
+    <p class="quote">The work stays yours. The blank page doesn't have to be.</p>
+    <div class="remember"><h4>Remember</h4><ul><li>Look for tasks that are repeated, written, and time-consuming.</li><li>AI drafts. People decide and sign off.</li></ul></div>
+  </div>
+</section>
+
+<!-- ================= 04 WATCH ================= -->
+<section class="chapter" id="watch">
+  <div class="opener"><div class="no">04</div><div><p class="part-of">A worked example</p><h2>Turn what one person knows into something everyone can use.</h2><p class="promise">Every shop has someone like Dale: 31 years on the same press, and the only one who really knows the die change. Here's how AI helps get that knowledge out of his head and onto the floor.</p></div></div>
+  <div class="flow">
+    <div class="demo" id="demo">
+      <div class="demoTop" role="tablist" aria-label="Demo steps"></div>
+
+      <article class="step" data-short="What Dale knows">
+        <div class="demoBody">
+          <h3>Start with the expert, not the keyboard.</h3>
+          <p class="why">Dale talked through his die change while someone recorded on a phone. Most phones transcribe a voice memo for free. This is what he said, word for word.</p>
+          <p class="outLbl">Dale's voice memo, transcribed</p>
+          <div class="out raw">"Okay so first thing, you lock it out, obviously, main disconnect and the air. Then I always run the slide down to bottom dead center before I pull anything. Some guys don't and that's how you get pinched. Pull the old die, use the cart, not the forklift, the forklift guys always ding the shoes. Clean the bolster, I mean really clean it, one chip under there and your parts are out. Set the new die, line up the locating pins, then the clamps. Snug them, then torque them, there's a number on the sheet in the office. Shut height, you check that before you cycle, every time. Then inch it through once, then one part, then you call quality for first article before you run. Oh, and the scrap chute, swap it if you're going from the four-inch brackets to the long ones."</div>
+          <p class="note"><b>This is the hard part, and it isn't AI.</b>The knowledge has to come from a person. AI's job is to turn it into something usable.</p>
+        </div>
+      </article>
+
+      <article class="step" data-short="A vague ask" hidden>
+        <div class="demoBody">
+          <h3>Ask vaguely, get something generic.</h3>
+          <div class="prompt" data-mode="show">Write an SOP for a die change.</div>
+          <p class="outLbl">What came back (excerpt)</p>
+          <div class="out bad">1. Purpose: This procedure ensures safe and efficient die changes in accordance with company standards.
+2. Scope: Applies to all stamping presses.
+3. Responsibilities: The Production Manager shall ensure all personnel are trained...
+4. Procedure: Ensure proper PPE is worn. Remove the die using appropriate lifting equipment...</div>
+          <p class="note warn"><b>It filled in every blank.</b>Nothing here is exactly wrong, and none of it is Dale's. It says "appropriate lifting equipment" when Dale said use the cart and never the forklift. It doesn't know your press, your people, or your rules.</p>
+        </div>
+      </article>
+
+      <article class="step" data-short="Give it context" hidden>
+        <div class="demoBody">
+          <h3>Tell it who it's for, what it should look like, and what it may not do.</h3>
+          <div class="prompt" data-mode="show">Turn the transcript below into a one-page work instruction for the Press 4 die change.
+
+Who it's for: operators with less than a year of experience. Some read English as a second language.
+Format: numbered steps, one action per step, short sentences. Safety steps first, marked SAFETY.
+Rules: Use only what's in the transcript. Don't add steps he didn't say. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing.
+
+Transcript: [Dale's voice memo]</div>
+          <p class="note"><b>Three things changed the result.</b>The audience, the format, and a rule against making things up. None of it is fancy wording. It's context only you have.</p>
+        </div>
+      </article>
+
+      <article class="step" data-short="The draft" hidden>
+        <div class="demoBody">
+          <h3>A draft that's actually Dale's.</h3>
+          <p class="outLbl">What came back</p>
+          <div class="out">PRESS 4 DIE CHANGE: WORK INSTRUCTION
+
+SAFETY 1. Lock out the main disconnect and the air supply.
+SAFETY 2. Run the slide down to bottom dead center before removing anything.
+3. Remove the old die with the die cart. Do not use the forklift.
+4. Clean the bolster completely. One chip can put parts out of spec.
+5. Set the new die. Line up the locating pins.
+6. Snug the clamps. Then torque them to the value on the setup sheet.
+7. Check shut height before cycling the press.
+8. Inch the press through one full stroke.
+9. Run one part. Call Quality for first-article inspection before running production.
+10. If changing from 4-inch brackets to long brackets, swap the scrap chute.
+
+Questions for the supervisor
+- What is the clamp torque value, and where is the setup sheet kept?
+- What is the correct shut height for each die?
+- Does lockout include any other energy sources, such as hydraulic or stored pressure?</div>
+          <p class="note"><b>Every step traces back to Dale.</b>And the gaps it couldn't fill became questions instead of guesses. That last question about other energy sources is one a supervisor needs to answer.</p>
+        </div>
+      </article>
+
+      <article class="step" data-short="Ask for more" hidden>
+        <div class="demoBody">
+          <h3>Build on it in the same conversation.</h3>
+          <div class="prompt" data-mode="show">Keep the steps exactly as written. Add a Spanish version below it.</div>
+          <div class="prompt" data-mode="show">Now write a five-question check a supervisor can use to confirm a new operator understands this.</div>
+          <p class="note"><b>One conversation, three useful pieces.</b>The work instruction, a translation, and a training check. A fluent speaker still reviews the translation, especially the safety steps.</p>
+        </div>
+      </article>
+
+      <article class="step" data-short="People sign off" hidden>
+        <div class="demoBody">
+          <h3>A person checks it, finishes it, and signs it.</h3>
+          <p class="why">Dale and his supervisor answer the three questions, add the torque value and shut heights, have the Spanish version checked, then sign, date, and post it at the press.</p>
+          <ul class="check">
+            <li>Every step matches how the job is really done</li>
+            <li>Every number comes from the setup sheet, not the AI</li>
+            <li>Safety steps reviewed against your lockout program</li>
+            <li>Signed and dated by the people responsible</li>
+          </ul>
+          <p class="note"><b>The time moves from writing to reviewing.</b>The knowledge stays Dale's. The decisions and the sign-off stay human. This works for any job that lives in one person's head.</p>
+        </div>
+      </article>
+
+      <div class="demoNav"><button class="btn small ghost" type="button" id="dPrev">Back</button><button class="btn small" type="button" id="dNext">Next step</button><span class="count" id="dCount"></span></div>
+    </div>
+
+    <h3 class="statement">Try it at your shop.</h3>
+    <p>Record someone explaining a job they know cold, transcribe it, and use this prompt. Remove anything confidential first.</p>
+<div class="prompt" data-mode="new">Turn the transcript below into a one-page work instruction for [the job].
+
+Who it's for: [who will use it and how experienced they are].
+Format: numbered steps, one action per step, short sentences. Safety steps first, marked SAFETY.
+Rules: Use only what's in the transcript. Don't add steps that weren't said. If anything is missing or unclear, list it under "Questions for the supervisor" instead of guessing.
+
+Transcript: [paste it here]</div>
+    <div class="remember"><h4>Remember</h4><ul><li>The knowledge comes from your people.</li><li>Context turns a generic answer into your answer.</li><li>A person always reviews and signs off.</li></ul></div>
+  </div>
+</section>
+
+<!-- ================= 05 METHOD ================= -->
+<section class="chapter" id="method">
+  <div class="opener"><div class="no">05</div><div><p class="part-of">How to get good results</p><h2>You don't need magic words.</h2><p class="promise">Prompting isn't about secret phrases. Four habits do almost all the work, and you just saw every one of them in Dale's example.</p></div></div>
+  <div class="flow">
+    <div class="principles">
+      <div><span class="n">01</span><h3>Know what finished looks like.</h3><p>Before you type anything, say who will use the result and what they'll be able to do with it. "A new operator can run the die change from one page."</p></div>
+      <div><span class="n">02</span><h3>Give it the context only you have.</h3><p>Who it's for, the format, your source material, your rules, and what it must not do. Specific beats long.</p></div>
+      <div><span class="n">03</span><h3>Steer it like a conversation.</h3><p>Rarely right on the first try, and that's normal. "Keep this, change that." "What are you assuming?" "Ask me what you need to know."</p></div>
+      <div><span class="n">04</span><h3>Watch where it's taking you.</h3><p>A GPS reroutes but keeps your destination. AI can quietly change the destination and make it sound reasonable. Check it against what you set out to do.</p></div>
+    </div>
+    <p class="quote">AI can help find the route. You own the destination.</p>
+  </div>
+</section>
+
+<!-- ================= 06 SAFE ================= -->
+<section class="chapter" id="safe">
+  <div class="opener"><div class="no">06</div><div><p class="part-of">Guardrails</p><h2>Use it without getting burned.</h2><p class="promise">Most AI problems in manufacturing come from what goes in and from what nobody checked on the way out.</p></div></div>
+  <div class="flow">
+    <div class="never">
+      <div class="no"><h3>Don't paste in</h3><ul><li>Customer drawings, specs, or pricing under NDA</li><li>Export-controlled or defense-related technical data</li><li>Employee personal or medical information</li><li>Passwords, account numbers, or system access details</li><li>Anything your company or customer contracts say stays inside</li></ul></div>
+      <div class="yes"><h3>Always check</h3><ul><li>Every number: dimensions, torque values, tolerances, quantities</li><li>Every safety step, against your actual programs</li><li>Names, dates, part numbers, and sources it cites</li><li>Translations, with a fluent speaker</li><li>That it's still answering the question you asked</li></ul></div>
+    </div>
+    <div class="callout"><b>Free versus business accounts.</b> Free consumer accounts may use your conversations to improve their models unless you change the settings. Business plans generally offer stronger data protections. Read the terms, check the settings, and when in doubt, describe the situation instead of pasting the real document.</div>
+    <h3 class="statement">Put a simple rule in writing.</h3>
+    <p class="lead">You don't need a 30-page policy to start. One page that says which tools are approved, what data never goes in, and that a person reviews anything that leaves the building covers most of the risk.</p>
+    <div class="remember"><h4>Remember</h4><ul><li>If you wouldn't email it to a stranger, don't paste it in.</li><li>Check every number and every safety step.</li></ul></div>
+  </div>
+</section>
+
+<!-- ================= 07 START ================= -->
+<section class="chapter" id="start">
+  <div class="opener"><div class="no">07</div><div><p class="part-of">Monday morning</p><h2>Where to start.</h2><p class="promise">Skip the big strategy for now. Prove it on one small, real task, then grow from what works.</p></div></div>
+  <div class="flow">
+    <ol class="plan">
+      <li><div><h3>Pick one annoying task.</h3><p>Repeated, written, and time-consuming. A weekly report, a type of customer email, a missing work instruction.</p></div></li>
+      <li><div><h3>Write down what finished looks like.</h3><p>Who uses the result, and what they'll be able to do with it.</p></div></li>
+      <li><div><h3>Try it with non-sensitive material.</h3><p>Use a general assistant and the four habits. Expect a few rounds of back and forth.</p></div></li>
+      <li><div><h3>Compare it to the old way.</h3><p>Was it faster? Was it as good once a person reviewed it? Be honest about both.</p></div></li>
+      <li><div><h3>Share what worked, and write the rule.</h3><p>Save the prompt that worked, show a coworker, and put your one-page guardrails in writing before it spreads.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= 08 PROMPTS ================= -->
+<section class="toolkit" id="prompts">
+  <div class="head">
+    <p style="font-family:var(--mono);font-size:13px;color:var(--accent-glow);margin-bottom:16px">08</p>
+    <h2>Prompts to keep.</h2>
+    <p>Starting points for common manufacturing tasks. Fill in the brackets, remove anything confidential, and expect to steer from there. They work in ChatGPT, Copilot, or any AI assistant.</p>
+  </div>
+  <div class="kit">
+    <div class="kitItem"><h3>Toolbox talk</h3><p class="use">Safety and training</p>
+<div class="prompt" data-mode="new">Write a five-minute toolbox talk on [topic] for [type of crew] at a [type of manufacturing] shop. Plain language, one real-world example, and three questions to ask the crew at the end. Don't invent statistics.</div></div>
+    <div class="kitItem"><h3>Customer email reply</h3><p class="use">Sales and front office</p>
+<div class="prompt" data-mode="new">Draft a reply to the customer email below. Our goal: [what you want to happen]. Tone: professional and direct. Don't promise dates, prices, or anything not stated in my notes.
+
+My notes: [key facts]
+Customer email: [paste it, with confidential details removed]</div></div>
+    <div class="kitItem"><h3>Corrective action first draft</h3><p class="use">Quality</p>
+<div class="prompt" data-mode="new">Help me draft an 8D corrective action report for this problem: [describe the defect, where it was found, and how many parts]. Walk me through 5 Whys one question at a time before you write anything. Mark anything you're assuming.</div></div>
+    <div class="kitItem"><h3>Troubleshooting guide</h3><p class="use">Maintenance</p>
+<div class="prompt" data-mode="new">Using only the manual section I'll paste below, create a one-page troubleshooting guide for [machine]: symptom, likely cause, what to check, and when to stop and call maintenance. If the manual doesn't cover something, say so.
+
+Manual section: [paste it]</div></div>
+    <div class="kitItem"><h3>Supplier comparison</h3><p class="use">Purchasing</p>
+<div class="prompt" data-mode="new">Compare these supplier quotes in a table: price, lead time, minimum order, payment terms, and anything unusual. Then list the questions I should ask each supplier before deciding.
+
+Quotes: [paste the key details]</div></div>
+    <div class="kitItem"><h3>Meeting to action items</h3><p class="use">Everyone</p>
+<div class="prompt" data-mode="new">Turn these meeting notes into a list of action items with an owner and due date for each. If an owner or date is missing, flag it instead of guessing.
+
+Notes: [paste them]</div></div>
+    <div class="kitItem"><h3>Job description</h3><p class="use">HR and hiring</p>
+<div class="prompt" data-mode="new">Write a job posting for a [role] at a [size and type] manufacturer in [town]. Must-haves: [list]. Nice-to-haves: [list]. Shift and pay: [details]. Plain, honest language. No buzzwords.</div></div>
+    <div class="kitItem"><h3>When the answer is generic</h3><p class="use">A follow-up for any task</p>
+<div class="prompt" data-mode="same">What assumptions did you make that I didn't tell you? Ask me the questions you need answered to make this specific to our shop.</div></div>
+  </div>
+</section>
+
+<!-- ================= CLOSING ================= -->
+<section class="closing" aria-label="Closing">
+  <p class="north">AI won't replace the people who know how your shop runs. <em>It can make sure what they know gets written down, shared, and used.</em></p>
+  <div class="ctas"><a class="btn" href="handout.html">Take-home sheet</a><a class="btn ghost" href="#prompts">Prompts to keep</a></div>
+  <div class="nextClass">
+    <p class="k">Keep this page</p>
+    <div style="display:flex;gap:22px;align-items:center;flex-wrap:wrap"><img src="assets/qr.svg" alt="QR code linking to this page" style="width:110px;height:110px;border:1px solid var(--hair);border-radius:12px;padding:8px;background:#fff"><div><h3>willardwonder.github.io/ai-manufacturing</h3><p>Everything from today, including every prompt, ready when you are.</p></div></div>
+  </div>
+</section>
+
+<footer class="site"><div class="in"><span>AI for Manufacturers. An overview with Josh Stutting.</span><span>The die change example and Dale are fictional. Tool names are examples, not endorsements.</span></div></footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="assets/app.js"></script>
+</body>
+</html>
