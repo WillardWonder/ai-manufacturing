@@ -49,7 +49,7 @@ if(demo){
 var links=$$(".navlist a"),secs=links.map(function(a){return $(a.getAttribute("href"))});
 function spy(){var y=window.scrollY+window.innerHeight*.3,cur=0;secs.forEach(function(s,k){if(s&&s.getBoundingClientRect().top+window.scrollY<=y)cur=k});
   links.forEach(function(a,k){a.classList.toggle("active",k===cur)});
-  var r=$(".navlist"),act=links[cur];if(r&&act){var l=act.offsetLeft-r.clientWidth/2+act.clientWidth/2;if(Math.abs(r.scrollLeft-l)>40)r.scrollLeft=l}}
+  var r=$(".navlist"),act=links[cur];if(r&&act&&r.scrollWidth>r.clientWidth+2){var ar=act.getBoundingClientRect(),rr=r.getBoundingClientRect();var l=Math.max(0,r.scrollLeft+(ar.left-rr.left)-r.clientWidth/2+ar.width/2);if(Math.abs(r.scrollLeft-l)>40)r.scrollLeft=l}}
 window.addEventListener("scroll",spy,{passive:true});spy();
 /* reading progress */
 (function(){var b=document.createElement("div");b.className="progress";b.setAttribute("aria-hidden","true");document.body.appendChild(b);

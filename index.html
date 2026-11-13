@@ -22,14 +22,14 @@
   <div class="in">
     <a class="mark" href="#top"><i aria-hidden="true"></i><span>AI for Manufacturers</span></a>
     <ul class="navlist">
-      <li><a href="#dale">Watch it work</a></li>
-      <li><a href="#built">Built with AI</a></li>
-      <li><a href="#what">What AI is</a></li>
-      <li><a href="#cost">Tools and cost</a></li>
-      <li><a href="#uses">Where it helps</a></li>
+      <li><a href="#dale">Demo</a></li>
+      <li><a href="#built">Examples</a></li>
+      <li><a href="#what">Basics</a></li>
+      <li><a href="#uses">Uses</a></li>
+      <li><a href="#cost">Cost</a></li>
       <li><a href="#safe">Guardrails</a></li>
-      <li><a href="#start">Start Monday</a></li>
-      <li><a href="#help">Get help</a></li>
+      <li><a href="#start">Start</a></li>
+      <li><a href="#help">Help</a></li>
       <li><a href="#prompts">Prompts</a></li>
     </ul>
     <a class="present" href="present.html">Present</a>
@@ -210,9 +210,25 @@ Transcript: [paste it here]</div>
   </div>
 </section>
 
+<!-- ================= USES ================= -->
+<section class="sec alt" id="uses">
+  <div class="sh"><span class="no">04</span><div><h2>Where it helps.</h2><p>The best early wins are the paperwork around the work: repeated, written, and eating hours every week.</p></div></div>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><h3>Production</h3><ul><li>Work instructions from an expert's explanation</li><li>Shift handoff summaries</li><li>Changeover and startup checklists</li></ul></div>
+      <div class="card"><h3>Quality</h3><ul><li>First drafts of 8D and corrective actions</li><li>5 Whys and fishbone brainstorming</li><li>Trends in a nonconformance spreadsheet</li></ul></div>
+      <div class="card"><h3>Maintenance</h3><ul><li>Troubleshooting guides from manuals</li><li>Preventive maintenance checklists</li><li>Work order history summaries</li></ul></div>
+      <div class="card"><h3>Sales and office</h3><ul><li>Quote and RFQ reply drafts</li><li>Summaries of long specs and emails</li><li>Product and capability sheets</li></ul></div>
+      <div class="card"><h3>Purchasing</h3><ul><li>Side-by-side supplier comparisons</li><li>Plain-language contract summaries</li><li>Lead time and price analysis</li></ul></div>
+      <div class="card"><h3>Safety and HR</h3><ul><li>Toolbox talks</li><li>Job postings and interview questions</li><li>Training quizzes and translations, checked by a fluent speaker</li></ul></div>
+    </div>
+    <p class="bar">AI drafts. People decide and sign off.</p>
+  </div>
+</section>
+
 <!-- ================= COST ================= -->
-<section class="sec alt" id="cost">
-  <div class="sh"><span class="no">04</span><div><h2>The tools, and what they cost.</h2><p>You don't need to buy anything to start. Begin at the top and only move down when a real need shows up.</p></div></div>
+<section class="sec" id="cost">
+  <div class="sh"><span class="no">05</span><div><h2>The tools, and what they cost.</h2><p>You don't need to buy anything to start. Begin at the top and only move down when a real need shows up.</p></div></div>
   <div class="body">
     <div class="tiers">
       <div class="tier"><div><span class="step">Start here</span><h3>General AI assistants</h3></div><div><div class="tags"><span>ChatGPT</span><span>Microsoft Copilot</span><span>Google Gemini</span><span>Claude</span></div><p>Write, summarize, translate, and analyze documents and spreadsheets you attach. Nothing to install.</p></div><div class="price">Free to $20–25<small>per person per month for business plans, which add stronger data protections</small></div></div>
@@ -221,6 +237,21 @@ Transcript: [paste it here]</div>
       <div class="tier"><div><span class="step">Biggest lift</span><h3>Industrial AI systems</h3></div><div><div class="tags"><span>Vision inspection</span><span>Predictive maintenance</span><span>Forecasting</span><span>Scheduling</span></div><p>Cameras, sensors, and connections to your equipment and data. Powerful when the problem is clear and the data is good.</p></div><div class="price">A real project<small>budget, integration, clean data, and a pilot. Start with a problem, not the technology.</small></div></div>
     </div>
     <p class="note">US list prices as of November 2026. Products and prices change often; check before you buy. Names are examples, not endorsements.</p>
+    <h3 class="big">Running your own model.</h3>
+    <p class="lead">A local model runs on a box in your building, so nothing goes to the cloud. It fits well when the work is text in, text out: chatting, drafting, summarizing your documents, or simple automations that only read and write plain language. Free software (Ollama or LM Studio with a chat screen like Open WebUI) runs the model. The money goes to hardware.</p>
+    <div class="sizer" role="table" aria-label="Local AI hardware by number of users">
+      <div class="srow shead" role="row"><span role="columnheader">Users</span><span role="columnheader">Example box</span><span role="columnheader">What it handles</span><span role="columnheader">Hardware, approx.</span><span role="columnheader">ChatGPT Business, 3 years</span></div>
+      <div class="srow" role="row"><span class="su" role="cell" data-l="Users">1–5</span><span role="cell" data-l="Example box"><b>AI mini PC</b>AMD Ryzen AI Max+ 395 with 128GB memory</span><span role="cell" data-l="What it handles">Mid-size open models, one or two people at a time</span><span class="sp" role="cell" data-l="Hardware">about $3,700</span><span class="sc" role="cell" data-l="ChatGPT, 3 yrs">$3,600</span></div>
+      <div class="srow" role="row"><span class="su" role="cell" data-l="Users">6–25</span><span role="cell" data-l="Example box"><b>NVIDIA DGX Spark</b>128GB, or two 64GB units linked</span><span role="cell" data-l="What it handles">Models up to about 200 billion parameters, a few people at once</span><span class="sp" role="cell" data-l="Hardware">$6,950<small>64GB model from $4,999</small></span><span class="sc" role="cell" data-l="ChatGPT, 3 yrs">$18,000</span></div>
+      <div class="srow" role="row"><span class="su" role="cell" data-l="Users">26–50</span><span role="cell" data-l="Example box"><b>Workstation, one Blackwell GPU</b>NVIDIA RTX PRO 6000 Blackwell, 96GB</span><span role="cell" data-l="What it handles">Same class of model, much faster, more people at once</span><span class="sp" role="cell" data-l="Hardware">$20,000–25,000<small>the card alone lists at $16,000</small></span><span class="sc" role="cell" data-l="ChatGPT, 3 yrs">$36,000</span></div>
+      <div class="srow" role="row"><span class="su" role="cell" data-l="Users">51–100</span><span role="cell" data-l="Example box"><b>Server, two Blackwell GPUs</b>Two RTX PRO 6000 Blackwell cards</span><span role="cell" data-l="What it handles">Larger models, or many people at once</span><span class="sp" role="cell" data-l="Hardware">$40,000–45,000</span><span class="sc" role="cell" data-l="ChatGPT, 3 yrs">$72,000</span></div>
+    </div>
+    <p class="note">Sizing assumes about 1 in 10 users typing at the same moment. ChatGPT comparison uses $20 per user per month, billed annually. Workstation and server totals are estimates. GPU prices have jumped all year because of a memory shortage, so get a current quote.</p>
+    <div class="grid g2" style="margin-top:22px">
+      <div class="card"><span class="lbl">Fits a local model</span><h3>Text in, text out</h3><ul><li>Chatting and drafting</li><li>Questions about your SOPs and manuals</li><li>Summaries, translations, rewrites</li><li>Simple automations that only read and write text</li></ul></div>
+      <div class="card"><span class="lbl">Gets harder fast</span><h3>Everything around the model</h3><ul><li>Images, drawings, and voice</li><li>Web search, email, ERP, and other connections</li><li>Agents that take actions</li><li>Who can see which documents, and logging every answer</li></ul></div>
+    </div>
+    <div class="callout"><b>The box is the cheap part.</b> Budget for setup, someone who owns updates and security, power, and replacement in 3 to 5 years. And a local model isn't a local system: every tool it can call is a way for data to leave.</div>
     <h3 class="big">Before you buy anything bigger.</h3>
     <p class="lead">Practical advice from NIST's Manufacturing Extension Partnership for small and mid-sized manufacturers:</p>
     <div class="grid g4">
@@ -235,22 +266,6 @@ Transcript: [paste it here]</div>
       <div class="card"><ul><li>Where has this worked on a problem like ours?</li><li>What data does it need, and in what shape?</li><li>When does it fail, and how will we know?</li><li>How does it connect to our ERP and maintenance system?</li></ul></div>
       <div class="card"><ul><li>What's the full cost: licenses, usage, setup, people, upkeep?</li><li>Who monitors and retrains it after go-live?</li><li>Where does our data go, and is it used to train your models?</li><li>Can we run a paid pilot before we commit?</li></ul></div>
     </div>
-  </div>
-</section>
-
-<!-- ================= USES ================= -->
-<section class="sec" id="uses">
-  <div class="sh"><span class="no">05</span><div><h2>Where it helps.</h2><p>The best early wins are the paperwork around the work: repeated, written, and eating hours every week.</p></div></div>
-  <div class="body">
-    <div class="grid g3">
-      <div class="card"><h3>Production</h3><ul><li>Work instructions from an expert's explanation</li><li>Shift handoff summaries</li><li>Changeover and startup checklists</li></ul></div>
-      <div class="card"><h3>Quality</h3><ul><li>First drafts of 8D and corrective actions</li><li>5 Whys and fishbone brainstorming</li><li>Trends in a nonconformance spreadsheet</li></ul></div>
-      <div class="card"><h3>Maintenance</h3><ul><li>Troubleshooting guides from manuals</li><li>Preventive maintenance checklists</li><li>Work order history summaries</li></ul></div>
-      <div class="card"><h3>Sales and office</h3><ul><li>Quote and RFQ reply drafts</li><li>Summaries of long specs and emails</li><li>Product and capability sheets</li></ul></div>
-      <div class="card"><h3>Purchasing</h3><ul><li>Side-by-side supplier comparisons</li><li>Plain-language contract summaries</li><li>Lead time and price analysis</li></ul></div>
-      <div class="card"><h3>Safety and HR</h3><ul><li>Toolbox talks</li><li>Job postings and interview questions</li><li>Training quizzes and translations, checked by a fluent speaker</li></ul></div>
-    </div>
-    <p class="bar">AI drafts. People decide and sign off.</p>
   </div>
 </section>
 

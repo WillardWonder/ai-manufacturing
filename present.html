@@ -21,13 +21,14 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:var(-
 .stage{position:fixed;inset:0;overflow:hidden}
 .deck{width:1920px;height:1080px;position:absolute;left:50%;top:50%;transform-origin:center center}
 .slide{position:absolute;inset:0;display:none;padding:110px 140px;overflow:hidden;background:var(--steel);color:var(--black)}
-.slide.on{display:flex;flex-direction:column;animation:in .35s ease}
+.slide.on{display:flex;flex-direction:column;justify-content:center;animation:in .35s ease}
 @keyframes in{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){.slide.on{animation:none}}
 .slide.dark{background:var(--black);color:#fff}
 .slide.yel{background:var(--yellow);color:var(--black)}
 .slide.center{justify-content:center}
-h1,h2,h3{margin:0;font-family:var(--head);font-weight:700;line-height:.95;letter-spacing:-.005em}
+.top{display:flex;justify-content:space-between;align-items:center;gap:40px;margin-bottom:36px}.top .k{margin:0}.top .sec{position:static;flex:none}
+h1,h2,h3{margin:0;font-family:var(--head);font-weight:700;line-height:1.02;letter-spacing:-.005em}
 p{margin:0}
 .k{font-family:var(--mono);font-size:30px;color:var(--gray);margin-bottom:36px}
 .dark .k{color:var(--yellow)}
@@ -107,9 +108,9 @@ p{margin:0}
 <div class="stage"><div class="deck" id="deck">
 
 <!-- 1 title -->
-<section class="slide dark">
+<section class="slide dark" data-nourl>
   <p class="k">AI for Manufacturers, with Josh Stutting</p>
-  <h1 class="t1">AI won't run your plant.<br><span class="y">It can take a lot<br>off your plate.</span></h1>
+  <h1 class="t1">AI won't run<br>your plant.<br><span class="y">It can take a lot<br>off your plate.</span></h1>
   <div class="stripe"></div>
 </section>
 
@@ -284,10 +285,29 @@ p{margin:0}
 <!-- 17 bowl -->
 <section class="slide">
   <span class="sec">What AI is</span>
-  <p class="k">Try it live: ask a few people to make "a bowl of fruit." Here's what usually comes back.</p>
+  <p class="k">Try it live: "Make a bowl of fruit."</p>
   <h2 class="t2">It fills in what you leave blank.</h2>
   <div class="bowl"><div>Wooden bowl<br>apples, grapes,<br>banana</div><div>White bowl<br>apples, grapes,<br>banana</div><div>Wooden bowl<br>apples, grapes,<br>orange</div><div>Glass bowl<br>apples, grapes,<br>banana</div></div>
   <p class="callout"><b>Vague in, generic out.</b>Every decision you skip, it makes for you.</p>
+</section>
+
+<!-- 19 uses -->
+<section class="slide">
+  <span class="sec">Where it helps</span>
+  <p class="k">The paperwork around the work</p>
+  <div class="three" style="margin-top:20px">
+    <div class="box"><h3>Production</h3><p>Work instructions, shift handoffs, changeover checklists</p></div>
+    <div class="box"><h3>Quality</h3><p>8D drafts, 5 Whys, nonconformance trends</p></div>
+    <div class="box"><h3>Maintenance</h3><p>Troubleshooting guides, PM checklists, work order history</p></div>
+    <div class="box"><h3>Sales and office</h3><p>Quote replies, spec summaries, capability sheets</p></div>
+    <div class="box"><h3>Purchasing</h3><p>Supplier comparisons, contract summaries, lead times</p></div>
+    <div class="box"><h3>Safety and HR</h3><p>Toolbox talks, job postings, quizzes, translations</p></div>
+  </div>
+</section>
+
+<!-- 20 drafts -->
+<section class="slide yel center">
+  <h2 class="t1">AI drafts.<br>People decide.</h2>
 </section>
 
 <!-- 18 cost -->
@@ -301,6 +321,19 @@ p{margin:0}
     <div class="rung"><div><span class="s">Biggest lift</span><h3>Industrial systems</h3></div><p>Vision inspection, predictive maintenance, forecasting</p><div class="pr">A real project<small>budget, integration, clean data, pilot</small></div></div>
   </div>
   <p style="font-size:24px;color:var(--gray);margin-top:20px">US list prices, November 2026. Check before you buy. Names are examples, not endorsements.</p>
+</section>
+
+<!-- run your own -->
+<section class="slide">
+  <span class="sec">Tools and cost</span>
+  <p class="k">Running your own model: hardware by number of users</p>
+  <div class="ladder">
+    <div class="rung"><div><span class="s">1–5 users</span><h3>AI mini PC</h3></div><p>Ryzen AI Max+ 395, 128GB. One or two people at a time.</p><div class="pr">~$3,700<small>vs. $3,600 for 3 years of ChatGPT Business</small></div></div>
+    <div class="rung"><div><span class="s">6–25 users</span><h3>DGX Spark</h3></div><p>NVIDIA's desktop AI box. Models up to ~200B parameters.</p><div class="pr">$6,950<small>vs. $18,000 for 3 years of ChatGPT</small></div></div>
+    <div class="rung"><div><span class="s">26–50 users</span><h3>One Blackwell GPU</h3></div><p>Workstation with an RTX PRO 6000, 96GB. Faster, more at once.</p><div class="pr">$20–25K<small>vs. $36,000 for 3 years of ChatGPT</small></div></div>
+    <div class="rung"><div><span class="s">51–100 users</span><h3>Two Blackwell GPUs</h3></div><p>A server with two RTX PRO 6000 cards.</p><div class="pr">$40–45K<small>vs. $72,000 for 3 years of ChatGPT</small></div></div>
+  </div>
+  <p style="font-size:24px;color:var(--gray);margin-top:20px">Fits text in, text out: chat, drafting, document questions, simple automations. The box is the cheap part: setup, upkeep, and security are the real cost. Estimates, November 2026.</p>
 </section>
 
 <!-- simple fix first -->
@@ -330,25 +363,6 @@ p{margin:0}
     <li>Where does our data go, and is it used to train your models?</li>
     <li>Can we run a paid pilot before we commit?</li>
   </ul>
-</section>
-
-<!-- 19 uses -->
-<section class="slide">
-  <span class="sec">Where it helps</span>
-  <p class="k">The paperwork around the work</p>
-  <div class="three" style="margin-top:20px">
-    <div class="box"><h3>Production</h3><p>Work instructions, shift handoffs, changeover checklists</p></div>
-    <div class="box"><h3>Quality</h3><p>8D drafts, 5 Whys, nonconformance trends</p></div>
-    <div class="box"><h3>Maintenance</h3><p>Troubleshooting guides, PM checklists, work order history</p></div>
-    <div class="box"><h3>Sales and office</h3><p>Quote replies, spec summaries, capability sheets</p></div>
-    <div class="box"><h3>Purchasing</h3><p>Supplier comparisons, contract summaries, lead times</p></div>
-    <div class="box"><h3>Safety and HR</h3><p>Toolbox talks, job postings, quizzes, translations</p></div>
-  </div>
-</section>
-
-<!-- 20 drafts -->
-<section class="slide yel center">
-  <h2 class="t1">AI drafts.<br>People decide.</h2>
 </section>
 
 <!-- 21 guardrails -->
@@ -413,7 +427,7 @@ p{margin:0}
 </section>
 
 <!-- 26 monday -->
-<section class="slide">
+<section class="slide" data-nourl>
   <span class="sec">Start Monday</span>
   <ol class="steps">
     <li><div>Pick one annoying task.<span>Repeated, written, time-consuming.</span></div></li>
@@ -435,14 +449,14 @@ p{margin:0}
 </section>
 
 <!-- 27 close -->
-<section class="slide dark">
+<section class="slide dark" data-nourl>
   <h2 class="t2">AI won't replace the people who know how your shop runs.</h2>
   <p class="sub" style="font-family:var(--head);font-weight:700;font-size:80px;opacity:1;color:var(--yellow);line-height:1">It can make sure what they know gets used.</p>
   <div class="stripe"></div>
 </section>
 
 <!-- 28 qr -->
-<section class="slide dark">
+<section class="slide dark" data-nourl>
   <p class="k">Keep everything from today</p>
   <h2 class="t2">Every example, every prompt, the take-home sheet.</h2>
   <div class="qrbig"><img src="assets/qr.svg" alt="QR code linking to the site"><p>willardwonder.github.io/<br>ai-manufacturing</p></div>
@@ -451,7 +465,7 @@ p{margin:0}
 </div></div>
 
 <div class="hud"><i id="bar"></i></div>
-<div class="urlTag" aria-hidden="true">willardwonder.github.io/ai-manufacturing</div>
+<div class="urlTag" id="urlTag" aria-hidden="true">willardwonder.github.io/ai-manufacturing</div>
 <div class="ctrl" id="ctrl"><button type="button" id="pv" aria-label="Previous slide">◀</button><span id="ct"></span><button type="button" id="nx" aria-label="Next slide">▶</button><button type="button" id="fs">Full screen</button><button type="button" id="hp">Keys</button><a href="index.html">Exit</a></div>
 <div class="help" id="help" role="dialog" aria-label="Keyboard shortcuts"><div>
 <b>→  Space  PgDn</b> Next slide<br><b>←  PgUp</b> Previous slide<br><b>Home / End</b> First / last slide<br><b>F</b> Full screen<br><b>Click</b> Right side next, left side back<br><b>Esc</b> Close this help</div></div>
@@ -460,8 +474,10 @@ p{margin:0}
 (function(){
 "use strict";
 var deck=document.getElementById("deck"),slides=[].slice.call(deck.querySelectorAll(".slide")),n=slides.length,i=0;
+slides.forEach(function(sl){var sec=sl.querySelector(":scope > .sec");if(!sec)return;var k=sl.querySelector(":scope > .k");var t=document.createElement("div");t.className="top";
+  var ref=k||[].slice.call(sl.children).filter(function(c){return c!==sec})[0];sl.insertBefore(t,ref);t.appendChild(k||document.createElement("span"));t.appendChild(sec)});
 function fit(){var s=Math.min(window.innerWidth/1920,window.innerHeight/1080);deck.style.transform="translate(-50%,-50%) scale("+s+")"}
-function go(k,push){i=Math.max(0,Math.min(n-1,k));slides.forEach(function(s,j){s.classList.toggle("on",j===i)});
+function go(k,push){i=Math.max(0,Math.min(n-1,k));slides.forEach(function(s,j){s.classList.toggle("on",j===i)});var ut=document.getElementById("urlTag");if(ut)ut.style.display=slides[i].hasAttribute("data-nourl")?"none":"";
   document.getElementById("bar").style.width=((i+1)/n*100)+"%";document.getElementById("ct").textContent=(i+1)+" / "+n;
   if(push!==false)history.replaceState(null,"","#"+(i+1))}
 function next(){go(i+1)}function prev(){go(i-1)}
