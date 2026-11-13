@@ -22,10 +22,10 @@
   <div class="in">
     <a class="mark" href="#top"><i aria-hidden="true"></i><span>AI for Manufacturers</span></a>
     <ul class="navlist">
-      <li><a href="#dale">Demo</a></li>
       <li><a href="#built">Examples</a></li>
       <li><a href="#what">Basics</a></li>
       <li><a href="#uses">Uses</a></li>
+      <li><a href="#dale">Demo</a></li>
       <li><a href="#cost">Cost</a></li>
       <li><a href="#safe">Guardrails</a></li>
       <li><a href="#start">Start</a></li>
@@ -42,7 +42,7 @@
       <p class="kicker">AI for Manufacturers, with Josh Stutting</p>
       <h1>AI won't run your plant. <span>It can take a lot off your plate.</span></h1>
       <p class="lede">No hype, no jargon. Real examples from real shops and small businesses, what the tools cost, where they help, and how to start without risking your data or your customers.</p>
-      <div class="ctas"><a class="btn y" href="#dale">See it work</a><a class="btn line" href="handout.html">Take-home sheet</a></div>
+      <div class="ctas"><a class="btn y" href="#built">See what it can do</a><a class="btn line" href="handout.html">Take-home sheet</a></div>
       <div class="qrRow"><img src="assets/qr.svg" alt="QR code linking to this page"><p><b>Keep this page.</b>Every example and prompt from today, ready when you are.</p></div>
     </div>
     <div class="pains" aria-label="Problems this helps with">
@@ -68,9 +68,67 @@
   </div>
 </section>
 
+<!-- ================= BUILT ================= -->
+<section class="sec alt" id="built">
+  <div class="sh"><span class="no">01</span><div><h2>Built with AI.</h2><p>Real tools for real businesses. None of them needed a software team. Every one started as a plain description of a problem. Open them on your phone.</p></div></div>
+  <div class="body">
+    <div class="grid g4">
+      <a class="tool" href="https://willardwonder.github.io/trapping/" target="_blank" rel="noopener"><span class="tt">Small product business</span><span class="tb"><h3>Daddy Daughter Trapping Supplies</h3><p>A family business that makes and sells its own product, The Egg Cover. Story, product, and contact, built without hiring a web firm.</p><span class="go">Open the site</span></span></a>
+      <a class="tool" href="https://willardwonder.github.io/aitraining/" target="_blank" rel="noopener"><span class="tt">Practice company</span><span class="tb"><h3>Flat Cap Co.</h3><p>A made-up company with an AI-made video and music, used as the practice business for four AI trainings: communication, documentation, media, and research.</p><span class="go">Open the site</span></span></a>
+      <a class="tool inroom" href="https://willardwonder.github.io/matwalker/" target="_blank" rel="noopener"><span class="tt">In the room today</span><span class="tb"><h3>MatWalker training shoes</h3><p>A real line of wrestling and training shoes, built with no background in shoes, design, or manufacturing. AI filled the gaps. The shoes are here. Pass them around.</p><span class="go">Open the site</span></span></a>
+      <a class="tool" href="tools/parcel-check.html" target="_blank" rel="noopener"><span class="tt">Field tool</span><span class="tb"><h3>Field parcel check</h3><p>Stand on a property and tap your GPS location. It pulls the county parcel record, forest-tax enrollment, soils, and nearby land sales, all from public sources.</p><span class="go">Open the tool</span></span></a>
+      <a class="tool" href="tools/land-deductions.html" target="_blank" rel="noopener"><span class="tt">Valuation</span><span class="tb"><h3>Land Deductions Evaluator</h3><p>Works out how easements, wetlands, floodplain, soils, slope, and access reduce a parcel's usable acres, and demands evidence for every percentage.</p><span class="go">Open the tool</span></span></a>
+      <a class="tool" href="https://willardwonder.github.io/inventory/" target="_blank" rel="noopener"><span class="tt">Operations</span><span class="tb"><h3>Inventory Tracker</h3><p>Parts and supplies by SKU, category, and location, with quantities, minimum stock, and total value. Replaces the spreadsheet nobody trusts.</p><span class="go">Open the tool</span></span></a>
+      <a class="tool" href="https://willardwonder.github.io/lci/" target="_blank" rel="noopener"><span class="tt">Fabricator</span><span class="tb"><h3>A fabricator's website</h3><p>A full site for a custom countertop fabricator: services, materials, process, and contact. The site small shops put off for years.</p><span class="go">Open the site</span></span></a>
+      <div class="tool yours"><span class="tt">Your shop</span><span class="tb"><h3>What's yours?</h3><p>A scrap and rework calculator. A changeover timer. A quote estimator. A new-hire quiz. Use the prompt below to start one.</p></span></div>
+    </div>
+    <p class="bar">If you can describe the problem, AI can help you build a first version.</p>
+    <div class="grid g2" style="align-items:start">
+      <div><p class="lead" style="margin-top:0">A scrap and rework calculator. A changeover timer. A quote estimator. A new-hire quiz. A checklist that prints itself. Describe what goes in, what should come out, and who uses it.</p>
+        <div class="callout"><b>A prototype isn't a finished system.</b> Before the shop depends on it, someone has to own it: test it, decide where the data lives, and keep it accurate.</div></div>
+<div class="prompt" data-mode="new">Build a single-page web tool that works offline for this problem: [describe the problem]. The people using it are [who]. They'll enter [inputs] and need to see [outputs]. Include a print button and a short note reminding users to check the results. Ask me up to five questions before you start building.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHAT ================= -->
+<section class="sec" id="what">
+  <div class="sh"><span class="no">02</span><div><h2>What AI actually is.</h2><p>"AI" means four different things. Knowing which one someone is selling you is half the battle.</p></div></div>
+  <div class="body">
+    <div class="grid g4">
+      <div class="card"><span class="lbl">Reads and writes</span><h3>AI assistants</h3><p>You type or talk in plain English. It writes, summarizes, translates, and analyzes.</p><p class="eg"><b>On the floor</b>Work instructions, shift reports, training.</p></div>
+      <div class="card"><span class="lbl">Learns from data</span><h3>Predictive AI</h3><p>Finds patterns in sensor, production, or sales data to forecast what comes next.</p><p class="eg"><b>On the floor</b>Flagging a bearing before it fails.</p></div>
+      <div class="card"><span class="lbl">Sees</span><h3>Computer vision</h3><p>Cameras plus software trained to recognize what they're looking at.</p><p class="eg"><b>On the floor</b>Spotting defects at line speed.</p></div>
+      <div class="card"><span class="lbl">Does</span><h3>Automation</h3><p>Robots and software bots. Many aren't AI at all; AI helps some handle variation.</p><p class="eg"><b>On the floor</b>A cobot adjusting to a part out of position.</p></div>
+    </div>
+    <p class="bar">Most of what you can use tomorrow, with no new equipment, is the first kind.</p>
+    <div class="facts">
+      <div class="fact"><span class="n">1</span><div><h3>It predicts. It doesn't know.</h3><p>It writes the most likely next words based on patterns from enormous amounts of text. Likely isn't the same as true, and it isn't the same as your shop's way.</p></div><div class="so"><b>So</b>It can sound sure and be wrong. Check what matters.</div></div>
+      <div class="fact"><span class="n">2</span><div><h3>It fills in what you leave blank.</h3><p>Ask a room full of people to have it draw "a bowl of fruit" and you get a room full of the same safe, generic bowl.</p></div><div class="so"><b>So</b>Vague in, generic out. Specific in, useful out.</div></div>
+      <div class="fact"><span class="n">3</span><div><h3>It only knows what you give it.</h3><p>It doesn't know your parts, customers, machines, or procedures unless you tell it or attach them.</p></div><div class="so"><b>So</b>What you give it decides what you get.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= USES ================= -->
+<section class="sec alt" id="uses">
+  <div class="sh"><span class="no">03</span><div><h2>Where it helps.</h2><p>The best early wins are the paperwork around the work: repeated, written, and eating hours every week.</p></div></div>
+  <div class="body">
+    <div class="grid g3">
+      <div class="card"><h3>Production</h3><ul><li>Work instructions from an expert's explanation</li><li>Shift handoff summaries</li><li>Changeover and startup checklists</li></ul></div>
+      <div class="card"><h3>Quality</h3><ul><li>First drafts of 8D and corrective actions</li><li>5 Whys and fishbone brainstorming</li><li>Trends in a nonconformance spreadsheet</li></ul></div>
+      <div class="card"><h3>Maintenance</h3><ul><li>Troubleshooting guides from manuals</li><li>Preventive maintenance checklists</li><li>Work order history summaries</li></ul></div>
+      <div class="card"><h3>Sales and office</h3><ul><li>Quote and RFQ reply drafts</li><li>Summaries of long specs and emails</li><li>Product and capability sheets</li></ul></div>
+      <div class="card"><h3>Purchasing</h3><ul><li>Side-by-side supplier comparisons</li><li>Plain-language contract summaries</li><li>Lead time and price analysis</li></ul></div>
+      <div class="card"><h3>Safety and HR</h3><ul><li>Toolbox talks</li><li>Job postings and interview questions</li><li>Training quizzes and translations, checked by a fluent speaker</li></ul></div>
+    </div>
+    <p class="bar">AI drafts. People decide and sign off.</p>
+  </div>
+</section>
+
 <!-- ================= DALE ================= -->
 <section class="sec" id="dale">
-  <div class="sh"><span class="no">01</span><div><h2>Watch it work.</h2><p>Every shop has a Dale: 31 years on Press 4 and the only one who really knows the die change. A quarter of Wisconsin's manufacturing workforce is approaching retirement. Here's how AI helps get that knowledge out of his head and onto the floor.</p></div></div>
+  <div class="sh"><span class="no">04</span><div><h2>Watch it work.</h2><p>Every shop has a Dale: 31 years on Press 4 and the only one who really knows the die change. A quarter of Wisconsin's manufacturing workforce is approaching retirement. Here's how AI helps get that knowledge out of his head and onto the floor.</p></div></div>
   <div class="body">
     <div class="demo" id="demo">
       <div class="demoTop" role="tablist" aria-label="Example steps"></div>
@@ -170,64 +228,8 @@ Transcript: [paste it here]</div>
   </div>
 </section>
 
-<!-- ================= BUILT ================= -->
-<section class="sec alt" id="built">
-  <div class="sh"><span class="no">02</span><div><h2>Built with AI.</h2><p>Real tools for real businesses. None of them needed a software team. Every one started as a plain description of a problem. Open them on your phone.</p></div></div>
-  <div class="body">
-    <div class="grid g3">
-      <a class="tool inroom" href="https://willardwonder.github.io/matwalker/" target="_blank" rel="noopener"><span class="tt">In the room today</span><span class="tb"><h3>MatWalker training shoes</h3><p>A new line of wrestling and training shoes, taken from idea to a product site you can show buyers, partners, or investors. The shoes are here. Pass them around.</p><span class="go">Open the site</span></span></a>
-      <a class="tool" href="https://willardwonder.github.io/trapping/" target="_blank" rel="noopener"><span class="tt">Small product business</span><span class="tb"><h3>Daddy Daughter Trapping Supplies</h3><p>A family business that makes and sells its own product, The Egg Cover. Story, product, and contact, built without hiring a web firm.</p><span class="go">Open the site</span></span></a>
-      <a class="tool" href="https://willardwonder.github.io/lci/" target="_blank" rel="noopener"><span class="tt">Fabricator</span><span class="tb"><h3>A fabricator's website</h3><p>A full site for a custom countertop fabricator: services, materials, process, and contact. The site small shops put off for years.</p><span class="go">Open the site</span></span></a>
-      <a class="tool" href="https://willardwonder.github.io/inventory/" target="_blank" rel="noopener"><span class="tt">Operations</span><span class="tb"><h3>Inventory Tracker</h3><p>Parts and supplies by SKU, category, and location, with quantities, minimum stock, and total value. Replaces the spreadsheet nobody trusts.</p><span class="go">Open the tool</span></span></a>
-      <a class="tool" href="tools/land-deductions.html" target="_blank" rel="noopener"><span class="tt">Valuation</span><span class="tb"><h3>Land Deductions Evaluator</h3><p>Works out how easements, wetlands, floodplain, soils, slope, and access reduce a parcel's usable acres, and demands evidence for every percentage.</p><span class="go">Open the tool</span></span></a>
-      <div class="tool yours"><span class="tt">Your shop</span><span class="tb"><h3>What's yours?</h3><p>A scrap and rework calculator. A changeover timer. A quote estimator. A new-hire quiz. Use the prompt below to start one.</p></span></div>
-    </div>
-    <p class="bar">If you can describe the problem, AI can help you build a first version.</p>
-    <div class="grid g2" style="align-items:start">
-      <div><p class="lead" style="margin-top:0">A scrap and rework calculator. A changeover timer. A quote estimator. A new-hire quiz. A checklist that prints itself. Describe what goes in, what should come out, and who uses it.</p>
-        <div class="callout"><b>A prototype isn't a finished system.</b> Before the shop depends on it, someone has to own it: test it, decide where the data lives, and keep it accurate.</div></div>
-<div class="prompt" data-mode="new">Build a single-page web tool that works offline for this problem: [describe the problem]. The people using it are [who]. They'll enter [inputs] and need to see [outputs]. Include a print button and a short note reminding users to check the results. Ask me up to five questions before you start building.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= WHAT ================= -->
-<section class="sec" id="what">
-  <div class="sh"><span class="no">03</span><div><h2>What AI actually is.</h2><p>"AI" means four different things. Knowing which one someone is selling you is half the battle.</p></div></div>
-  <div class="body">
-    <div class="grid g4">
-      <div class="card"><span class="lbl">Reads and writes</span><h3>AI assistants</h3><p>You type or talk in plain English. It writes, summarizes, translates, and analyzes.</p><p class="eg"><b>On the floor</b>Dale's work instruction.</p></div>
-      <div class="card"><span class="lbl">Learns from data</span><h3>Predictive AI</h3><p>Finds patterns in sensor, production, or sales data to forecast what comes next.</p><p class="eg"><b>On the floor</b>Flagging a bearing before it fails.</p></div>
-      <div class="card"><span class="lbl">Sees</span><h3>Computer vision</h3><p>Cameras plus software trained to recognize what they're looking at.</p><p class="eg"><b>On the floor</b>Spotting defects at line speed.</p></div>
-      <div class="card"><span class="lbl">Does</span><h3>Automation</h3><p>Robots and software bots. Many aren't AI at all; AI helps some handle variation.</p><p class="eg"><b>On the floor</b>A cobot adjusting to a part out of position.</p></div>
-    </div>
-    <p class="bar">Most of what you can use tomorrow, with no new equipment, is the first kind.</p>
-    <div class="facts">
-      <div class="fact"><span class="n">1</span><div><h3>It predicts. It doesn't know.</h3><p>It writes the most likely next words based on patterns from enormous amounts of text. Likely isn't the same as true, and it isn't the same as your shop's way.</p></div><div class="so"><b>So</b>It can sound sure and be wrong. Check what matters.</div></div>
-      <div class="fact"><span class="n">2</span><div><h3>It fills in what you leave blank.</h3><p>Ask a room full of people to have it draw "a bowl of fruit" and you get a room full of the same safe, generic bowl.</p></div><div class="so"><b>So</b>Vague in, generic out. Specific in, useful out.</div></div>
-      <div class="fact"><span class="n">3</span><div><h3>It only knows what you give it.</h3><p>It doesn't know your parts, customers, machines, or procedures unless you tell it or attach them.</p></div><div class="so"><b>So</b>What you give it decides what you get.</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ================= USES ================= -->
-<section class="sec alt" id="uses">
-  <div class="sh"><span class="no">04</span><div><h2>Where it helps.</h2><p>The best early wins are the paperwork around the work: repeated, written, and eating hours every week.</p></div></div>
-  <div class="body">
-    <div class="grid g3">
-      <div class="card"><h3>Production</h3><ul><li>Work instructions from an expert's explanation</li><li>Shift handoff summaries</li><li>Changeover and startup checklists</li></ul></div>
-      <div class="card"><h3>Quality</h3><ul><li>First drafts of 8D and corrective actions</li><li>5 Whys and fishbone brainstorming</li><li>Trends in a nonconformance spreadsheet</li></ul></div>
-      <div class="card"><h3>Maintenance</h3><ul><li>Troubleshooting guides from manuals</li><li>Preventive maintenance checklists</li><li>Work order history summaries</li></ul></div>
-      <div class="card"><h3>Sales and office</h3><ul><li>Quote and RFQ reply drafts</li><li>Summaries of long specs and emails</li><li>Product and capability sheets</li></ul></div>
-      <div class="card"><h3>Purchasing</h3><ul><li>Side-by-side supplier comparisons</li><li>Plain-language contract summaries</li><li>Lead time and price analysis</li></ul></div>
-      <div class="card"><h3>Safety and HR</h3><ul><li>Toolbox talks</li><li>Job postings and interview questions</li><li>Training quizzes and translations, checked by a fluent speaker</li></ul></div>
-    </div>
-    <p class="bar">AI drafts. People decide and sign off.</p>
-  </div>
-</section>
-
 <!-- ================= COST ================= -->
-<section class="sec" id="cost">
+<section class="sec alt" id="cost">
   <div class="sh"><span class="no">05</span><div><h2>The tools, and what they cost.</h2><p>You don't need to buy anything to start. Begin at the top and only move down when a real need shows up.</p></div></div>
   <div class="body">
     <div class="tiers">
@@ -270,7 +272,7 @@ Transcript: [paste it here]</div>
 </section>
 
 <!-- ================= SAFE ================= -->
-<section class="sec alt" id="safe">
+<section class="sec" id="safe">
   <div class="sh"><span class="no">06</span><div><h2>Use it without getting burned.</h2><p>Most problems come from what goes in, and from what nobody checked on the way out.</p></div></div>
   <div class="body">
     <div class="dd">
@@ -292,7 +294,7 @@ Transcript: [paste it here]</div>
 </section>
 
 <!-- ================= START ================= -->
-<section class="sec" id="start">
+<section class="sec alt" id="start">
   <div class="sh"><span class="no">07</span><div><h2>Start Monday.</h2><p>Bring your people in, use four habits that get good results, and prove it on one real task.</p></div></div>
   <div class="body">
     <h3 class="big" style="margin-top:0">Bring the floor in early.</h3>
@@ -319,7 +321,7 @@ Transcript: [paste it here]</div>
 </section>
 
 <!-- ================= HELP ================= -->
-<section class="sec alt" id="help">
+<section class="sec" id="help">
   <div class="sh"><span class="no">08</span><div><h2>Get help close to home.</h2><p>You don't have to figure this out alone. Both of these are right here in central Wisconsin.</p></div></div>
   <div class="body">
     <div class="grid g2">
@@ -362,7 +364,7 @@ Notes: [paste them]</div></div>
 </section>
 
 <section class="close" aria-label="Closing">
-  <div><h2>AI won't replace the people who know how your shop runs. <span>It can make sure what they know gets used.</span></h2>
+  <div><h2>AI won't replace the people who know how your shop runs.<br><span>It can make sure what they know gets used.</span></h2>
     <div class="ctas" style="margin-top:28px"><a class="btn" href="handout.html">Take-home sheet</a><a class="btn ghost" href="present.html">Present</a></div></div>
   <div class="qr"><img src="assets/qr.svg" alt="QR code linking to this page">willardwonder.github.io/ai-manufacturing</div>
 </section>

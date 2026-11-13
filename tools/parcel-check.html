@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0F172A">
+    <title>Field Parcel Check</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect width=%2224%22 height=%2224%22 fill=%22%230E1114%22/%3E%3Cpath d=%22M3 21V10l5 3V10l5 3V7l5 3V4h3v17z%22 fill=%22%23FFC20E%22/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <style>
+        :root {
+            --bg: #0F172A; --panel: #1E293B; --line: #334155; --text: #F8FAFC; --muted: #94A3B8;
+            --gold: #E2B13C; --sel: #38BDF8; --warn: #FCD34D; --warn-bg: rgba(245, 158, 11, .12);
+            --warn-line: rgba(245, 158, 11, .45); --err: #F87171; --err-bg: rgba(248, 113, 113, .12);
+            --info-bg: rgba(56, 189, 248, .10); --info-line: rgba(56, 189, 248, .40);
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; background: var(--bg); color: var(--text);
+            font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+        body { padding: 12px 16px calc(24px + env(safe-area-inset-bottom)); }
+        .wrap { max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px; }
+        header { text-align: center; }
+        h1 { margin: 0; font-size: 18px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+        .sub { margin: 2px 0 0; font-size: 12px; color: var(--muted); }
+        .map-wrap { position: relative; }
+        #map { height: 46vh; min-height: 260px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); }
+        .map-hint { position: absolute; left: 8px; bottom: 8px; z-index: 500; max-width: calc(100% - 16px);
+            background: rgba(15, 23, 42, .88); color: var(--text); font-size: 12px; padding: 4px 8px; border-radius: 6px; }
+        button { font: inherit; border: 0; border-radius: 10px; cursor: pointer; }
+        button:disabled { opacity: .55; cursor: default; }
+        .btn-primary { width: 100%; padding: 14px; background: var(--gold); color: #0F172A; font-weight: 700; font-size: 16px; }
+        .btn-secondary { padding: 0 16px; background: var(--line); color: var(--text); font-weight: 600; }
+        .btn-ghost { width: 100%; padding: 11px; margin-top: 12px; background: transparent; color: var(--gold);
+            border: 1px solid var(--gold); font-weight: 600; }
+        .row { display: flex; gap: 8px; }
+        input { flex: 1; min-width: 0; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--line);
+            background: var(--panel); color: var(--text); font: inherit; }
+        input:focus, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+        .badge { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px;
+            font-size: 13px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+        #status { min-height: 19px; font-size: 13px; text-align: center; color: var(--muted); }
+        #status.err { color: var(--err); }
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+        .card-kicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+        .card-title { margin: 2px 0 0; font-size: 20px; font-weight: 700; word-break: break-all; }
+        .card-sub { color: var(--muted); font-size: 13px; }
+        .banner { border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-top: 10px; border: 1px solid; }
+        .banner.warn { background: var(--warn-bg); border-color: var(--warn-line); color: var(--warn); }
+        .banner.info { background: var(--info-bg); border-color: var(--info-line); color: #BAE6FD; }
+        .banner.err { background: var(--err-bg); border-color: var(--err); color: #FECACA; }
+        .section { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold);
+            margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+        dl { display: grid; grid-template-columns: minmax(118px, 42%) 1fr; gap: 6px 12px; margin: 0; }
+        dt { color: var(--muted); font-size: 13px; }
+        dd { margin: 0; font-variant-numeric: tabular-nums; word-break: break-word; }
+        .pending { color: var(--warn); font-style: italic; font-size: 13px; }
+        .pick { display: block; width: 100%; text-align: left; margin-top: 6px; padding: 10px 12px;
+            background: var(--bg); color: var(--text); border: 1px solid var(--line); font-size: 14px; }
+        .pick small { display: block; color: var(--muted); }
+        .ai { white-space: pre-wrap; font-size: 14px; }
+        .fine { font-size: 12px; color: var(--muted); margin-top: 6px; }
+        .hidden { display: none !important; }
+        .sig { display: grid; grid-template-columns: 22px 1fr; gap: 2px 8px; margin: 6px 0; }
+        .sig-icon { font-weight: 700; text-align: center; }
+        .sig-yes { color: #4ADE80; } .sig-no { color: var(--muted); } .sig-unk { color: var(--warn); }
+        .sig-detail { grid-column: 2; font-size: 13px; color: var(--muted); }
+        .item { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-top: 6px; background: var(--bg); }
+        .item-title { font-weight: 600; }
+        .item-meta { font-size: 13px; color: var(--muted); }
+        .loading { color: var(--muted); font-size: 13px; padding: 10px 0; }
+        details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 8px; }
+        a { color: var(--sel); }
+    </style>
+<script>
+/* Public-data lookups, run in the browser. */
+(function(){var __COMPS={"source":"Wisconsin DOR Real Estate Transfer Returns (RETR), Historical Data CSV","filter":"Arm's-length sale, full parcel, land only, no rights retained, no personal property, >= 5 ac, use class 4/5/5M/6","coverage":{"from":"2026-03-24","to":"2026-08-31"},"builtAt":"2026-10-14T21:12:00.276Z","fields":["doc","county","municipality","date","use","acres","mflAcres","price","parcel","lat","lng","plss","waterFt"],"rows":[["1943697","Marathon","Marathon, Town of","2026-08-31","5",37.64,0,425000,"054-2806-332-0999",44.85322,-89.76417,"S33 T28N R6E",0],["371713","Ashland","Ashland, City of","2026-08-31","5",6.36,0,135000,"201-04851-0000",46.56203,-90.92106,"S7 T47N R4W",0],["378057","Rusk","Atlanta, Town of","2026-08-31","5",40,0,495000,"002-01094-0000",45.46144,-91.30295,"S36 T35N R8W",0],["774539","Juneau","Orange, Town of","2026-08-28","4",20,0,90000,"290300344",43.9409,-90.19605,"S13 T17N R2E",0],["345806","Richland","Westford, Town of","2026-08-28","5",40,0,340000,"030-2714-0000",43.47749,-90.23768,"S27 T12N R2E",0],["1640735","Washington","West Bend, Town of","2026-08-28","5",13.51,0,264600,"T13-0120861",43.41957,-88.24748,"S17 T11N R19E",0],["378040","Rusk","Washington, Town of","2026-08-28","5",22.09,0,157000,"042-00227-0025",45.34559,-91.1983,"S11 T33N R7W",0],["249443","Forest","Nashville, Town of","2026-08-28","6",40,40,1170000,"022-01593-0001",45.38903,-88.85216,"S26 T34N R13E",0],["396343","Iowa","Highland, Town of","2026-08-28","4",28.19,0,175000,"012 1220.00",42.99961,-90.41706,"S7 T6N R1E",0],["947902","Polk","Clear Lake, Town of","2026-08-28","5",40.48,0,260000,"018-00480-0000",45.22974,-92.16153,"S24 T32N R15W",0],["947830","Polk","Apple River, Town of","2026-08-28","5",42.94,22,1000000,"004-00240-0000",45.43248,-92.39436,"S7 T34N R16W",0],["1227899","Fond du Lac","Metomen, Town of","2026-08-28","6",8,0,115000,"T14-15-14-28-10-002-00",43.73816,-88.81619,"S28 T15N R14E",0],["684660","Dunn","Otter Creek, Town of","2026-08-28","5",40,0,600000,"17020-2-301205-009-0001",45.09941,-91.87084,"S5 T30N R12W",0],["378067","Rusk","Willard, Town of","2026-08-28","5",40,0,340000,"046-00256-0000",45.33111,-91.09529,"S15 T33N R6W",0],["396365","Iowa","Arena, Town of","2026-08-28","4",33.39,0,1170000,"002 1435.0",43.07201,-89.96187,"S13 T7N R4E",0],["371700","Ashland","Sanborn, Town of","2026-08-28","5",40,0,45000,"022-00761-0000",46.56203,-90.60567,"S10 T47N R2W",0],["547169","Vernon","Greenwood, Town of","2026-08-28","6",20,0,164570,"016-00465-0001",43.57886,-90.39701,"S20 T13N R1E",0],["378034","Rusk","True, Town of","2026-08-28","5",40,0,100000,"040-00164-0000",45.50489,-90.87044,"S16 T35N R4W",1452],["1283786","Eau Claire","Eau Claire, City of","2026-08-27","5",16.49,0,329800,"18221-2-271001-210-9003",44.83874,-91.53808,"S1 T27N R10W",0],["431572","Green Lake","Brooklyn, Town of","2026-08-27","4",40,0,450000,"004-00167-0000",43.83953,-88.95376,"S20 T16N R13E",0],["643587","Green","New Glarus, Town of","2026-08-27","4",13,0,85000,"23024 0011.0000",42.84031,-89.60872,"S1 T4N R7E",0],["903508","Marinette","Beecher, Town of","2026-08-26","5",36.8,0,175000,"008-00825.000",45.57729,-87.89679,"S21 T36N R21E",0],["774476","Juneau","Finley, Town of","2026-08-26","4",6,0,45000,"290080239",44.21604,-90.11429,"S10 T20N R3E",0],["345772","Richland","Akan, Town of","2026-08-26","5",6.25,0,20000,"002-0841-2000",43.34716,-90.63568,"S8 T10N R2W",0],["673732","Clark","Hendren, Town of","2026-08-26","4",30.61,0,100000,"020.0058.002",44.75185,-90.72212,"S3 T26N R3W",0],["859430","Grant","Wingville, Town of","2026-08-26","4",40,0,850000,"062-00479-0000",42.97064,-90.45658,"S23 T6N R1W",0],["799751","Shawano","Fairbanks, Town of","2026-08-26","5",30,0,152500,"014-19410-0010",44.70841,-89.07421,"S19 T26N R12E",0],["420705","Washburn","Casey, Town of","2026-08-26","6",6.31,0,52000,"65-014-2-40-13-28-5 05-002-002000",45.91036,-88.87899,"S28 T40N R13E",0],["420699","Washburn","Casey, Town of","2026-08-26","6",14.63,0,90000,"65-014-2-40-13-28-5 05-002-001010",45.91036,-91.99568,"S28 T40N R13W",0],["583150","Lincoln","Skanawan, Town of","2026-08-26","5",5.01,0,49000,"026-3407-062-9986",45.44696,-89.67481,"S6 T34N R7E",0],["673722","Clark","Dewhurst, Town of","2026-08-25","6",40,0,330000,"008.0070.000",44.46223,-90.68014,"S13 T23N R3W",0],["947745","Polk","Lincoln, Town of","2026-08-25","4",20,0,389000,"032-00508-0000",45.31663,-92.36978,"S20 T33N R16W",0],["1293780","Sauk","Spring Green, Town of","2026-08-25","4",39.05,0,400000,"032-0477-00000",43.17338,-90.13951,"S9 T8N R3E",0],["383740","Lafayette","Wiota, Town of","2026-08-25","4",18,0,126000,"036.0412.0000",42.60861,-89.86713,"S26 T2N R5E",0],["345804","Richland","Richwood, Town of","2026-08-25","4",41,1,120000,"024-0734-1000",43.26027,-90.65524,"S7 T9N R2W",0],["634844","Pierce","Ellsworth, Town of","2026-08-25","5M",10,0,75000,"006-01064-1000",44.70841,-92.47131,"S20 T26N R17W",0],["1973952","Winnebago","Omro, Town of","2026-08-24","5",5,0,95000,"016-06830102",43.99882,-88.70864,"S29 T18N R15E",0],["249428","Forest","Hiles, Town of","2026-08-24","5",17.5,0,209000,"016-00224-0000",45.67866,-88.96818,"S14 T37N R12E",0],["859425","Grant","Hazel Green, Town of","2026-08-24","5",10.25,0,70000,"022-00400-0020",42.55068,-90.49563,"S16 T1N R1W",0],["1853755","La Crosse","Shelby, Town of","2026-08-24","5",10.15,0,165000,"11-02380-002",43.72368,-91.17711,"S35 T15N R7W",0],["997949","Columbia","Leeds, Town of","2026-08-24","6",28.79,0,1000000,"11018 426",43.3182,-89.26452,"S23 T10N R10E",0],["684548","Dunn","Red Cedar, Town of","2026-08-24","4",72,0,525000,"17024-2-281234-110-0002",44.85322,-91.82386,"S34 T28N R12W",0],["498131","Burnett","West Marshland, Town of","2026-08-24","6",9.8,0,72000,"07-040-2-39-19-27-3 01-000-011000",45.82348,-92.71932,"S27 T39N R19W",0],["377988","Rusk","Big Bend, Town of","2026-08-24","5",22.06,0,48000,"004-00415-0000",45.31663,-91.38294,"S20 T33N R8W",0],["498026","Burnett","Anderson, Town of","2026-08-24","5",11,2,45000,"07-002-2-37-19-12-3 02-000-011000",45.69314,-92.67258,"S12 T37N R19W",0],["2199539","Sheboygan","Wilson, Town of","2026-08-24","4",29.11,0,1937635,"59030454780",43.69471,-87.71764,"S10 T14N R23E",0],["859296","Grant","Muscoda, Town of","2026-08-21","6",21.15,0,215000,"042-00636-0010",43.1589,-90.43685,"S13 T8N R1W",0],["1943156","Marathon","Elderon, Town of","2026-08-21","5M",40,0,280000,"022-2710-131-0997",44.80978,-89.21448,"S13 T27N R10E",0],["947605","Polk","Eureka, Town of","2026-08-21","5",14.3,0,110000,"020-00575-0000",45.4904,-92.60261,"S21 T35N R18W",0],["482002","Langlade","Elcho, Town of","2026-08-21","5",40.7,40.7,225000,"008-0008",45.44696,-89.20086,"S1 T34N R10E",0],["371687","Ashland","Jacobs, Town of","2026-08-21","6",20,0,60000,"012-00781-0200",46.17103,-90.43738,"S25 T43N R1W",0],["396282","Iowa","Highland, Town of","2026-08-21","4",40,36,246438,"012 0879.0",43.04305,-90.31815,"S25 T7N R1E",0],["290799","Buffalo","Buffalo, Town of","2026-08-21","4",39.58,0,640000,"006-00533-0000",44.07123,-91.62418,"S31 T19N R10W",0],["922999","Barron","Crystal Lake, Town of","2026-08-21","5",5,0,30000,"016-1800-12-000",45.50489,-92.14936,"S18 T35N R14W",0],["547063","Vernon","Franklin, Town of","2026-08-21","4",20,0,200000,"012-00667-0000",43.46301,-90.8751,"S32 T12N R4W",0],["489868","Kewaunee","Carlton, Town of","2026-08-21","4",38.1,0,740000,"31 004 28.141",44.34638,-87.58662,"S28 T22N R24E",0],["482066","Langlade","Upham, Town of","2026-08-21","5",17.5,0,92700,"030-0523.003",45.28766,-89.2043,"S36 T33N R10E",0],["1943247","Marathon","Bern, Town of","2026-08-21","4",40,40,1000000,"006-3003-043-0998",45.09941,-90.12997,"S4 T30N R3E",0],["736382","Monroe","Tomah, Town of","2026-08-20","5",40.17,0,150500,"042-00144-0000",43.95538,-90.51732,"S8 T17N R1W",0],["634778","Pierce","Hartland, Town of","2026-08-20","4",40,0,1508744,"012-01043-0800",44.62152,-92.48856,"S19 T25N R17W",0],["634767","Pierce","Maiden Rock, Town of","2026-08-20","5M",41.11,0,993425,"016-01001-0200",44.57808,-92.14198,"S1 T24N R15W",0],["560171","Waushara","Bloomfield, Town of","2026-08-20","4",40,0,60000,"004-03244-0000",44.15812,-88.94583,"S32 T20N R13E",0],["625747","Vilas","Presque Isle, Town of","2026-08-20","6",80,0,1800000,"22-1352",46.22895,-89.62236,"S4 T43N R7E",0],["973594","Chippewa","Colburn, Town of","2026-08-19","5",5,0,80000,"23105-3441-76289002",45.11389,-90.94934,"S35 T31N R5W",0],["925452","Portage","Lanark, Town of","2026-08-19","6",39.7,0,200000,"022-22-1033-06",44.33189,-89.28503,"S33 T22N R10E",0],["941986","Waupaca","Farmington, Town of","2026-08-19","4",5,0,74000,"05  10 32 20",44.38982,-89.14228,"S10 T22N R11E",0],["1376676","Dodge","Leroy, Town of","2026-08-19","5",5,0,125000,"028-1316-0531-001",43.62231,-88.59962,"S5 T13N R16E",0],["684480","Dunn","Peru, Town of","2026-08-19","5",13.21,0,92000,"17022-2-261231-340-0005",44.67945,-91.88066,"S31 T26N R12W",0],["1298420","Manitowoc","Manitowoc, City of","2026-08-18","5",32.31,0,1228000,"052-836-304-040.00",44.07123,-87.66022,"S36 T19N R23E",0],["482016","Langlade","Upham, Town of","2026-08-18","6",40,0,80000,"030-0481",45.28766,-89.26595,"S33 T33N R10E",0],["377924","Rusk","Big Falls, Town of","2026-08-17","5",26.67,0,445000,"006-00320-0001",45.57729,-91.01559,"S20 T36N R5W",0],["559993","Waushara","Coloma, Town of","2026-08-17","5M",39.9,0,255000,"006-01211-0200",44.04227,-89.47163,"S12 T18N R8E",0],["2199202","Sheboygan","Mitchell, Town of","2026-08-17","5",36.93,0,520000,"59012165341",43.65127,-88.07925,"S27 T14N R20E",0],["643401","Green","Sylvester, Town of","2026-08-17","4",10,0,15000,"23028 0085.0000",42.65205,-89.55224,"S9 T2N R8E",0],["1510818","Jefferson","Ixonia, Town of","2026-08-17","4",19.21,0,678500,"012-0816-2124-003",43.14442,-88.59415,"S21 T8N R16E",0],["947527","Polk","Black Brook, Town of","2026-08-17","5",67,0,277500,"010-00883-0100",45.20078,-92.28375,"S36 T32N R16W",0],["371582","Ashland","Marengo, Town of","2026-08-17","6",45.39,45.39,120000,"016-00324-0200",46.33032,-90.91896,"S31 T45N R4W",0],["859137","Grant","Smelser, Town of","2026-08-14","4",6.49,0,202184,"054-00456-0020",42.63757,-90.53503,"S18 T2N R1W",0],["424984","Jackson","Cleveland, Town of","2026-08-14","5",40,0,184370,"014-0115.0000",44.5636,-91.00524,"S8 T24N R5W",0],["2199101","Sheboygan","Sheboygan, Town of","2026-08-14","5",15.6,0,500000,"59024341594",43.79608,-87.73307,"S4 T15N R23E",0],["774273","Juneau","Orange, Town of","2026-08-14","4",33,0,290000,"290300292",43.95538,-90.23616,"S10 T17N R2E",0],["1298228","Manitowoc","Newton, Town of","2026-08-14","5",35.82,0,340000,"014-023-015-001.00",44.0133,-87.68302,"S23 T18N R23E",0],["922863","Barron","Stanley, Town of","2026-08-14","6",15,0,250000,"044-1400-11-001",45.418,-91.6936,"S14 T34N R11W",0],["1942720","Marathon","Rib Falls, Town of","2026-08-14","4",40,0,510000,"066-2905-304-0998",44.95459,-89.92643,"S30 T29N R5E",0],["6120067","Dane","Roxbury, Town of","2026-08-14","6",10.1,10.1,650000,"050/090701482406",43.27475,-89.60291,"S1 T9N R7E",0],["1640032","Washington","West Bend, Town of","2026-08-14","6",44,0,250000,"T13-0611100",43.3906,-88.24852,"S29 T11N R19E",0],["3136466","Brown","Morrison, Town of","2026-08-14","4",34.6,0,121000,"M-19",44.31741,-87.89111,"S1 T21N R21E",0],["343564","Marquette","Montello, Town of","2026-08-14","4",99,0,720000,"012-00481-0000",43.79608,-89.25526,"S2 T15N R10E",0],["799459","Shawano","Morris, Town of","2026-08-14","5",16.8,0,110000,"032-23230-0000",44.7953,-88.99068,"S23 T27N R12E",0],["462244","Sawyer","Radisson, Town of","2026-08-14","5",12.15,0,160000,"022-738-13-5804",45.76555,-91.18337,"S13 T38N R7W",0],["1134501","Walworth","Elkhorn, City of","2026-08-13","4",14.07,0,465000,"YU NW 00253",42.6955,-88.54845,"S25 T3N R16E",0],["634722","Pierce","Trenton, Town of","2026-08-13","4",40,0,275000,"030-01030-0500",44.57808,-92.5479,"S3 T24N R18W",0],["493287","Trempealeau","Preston, Town of","2026-08-13","4",7.74,0,529000,"024-00990-0000",44.33189,-91.20506,"S34 T22N R7W",0],["1942971","Marathon","Cleveland, Town of","2026-08-13","5",9.72,0,110000,"014-2704-261-0992",44.78082,-89.96868,"S26 T27N R4E",0],["1942610","Marathon","Elderon, Town of","2026-08-13","5",60,0,335000,"022-2710-102-0995",44.82426,-89.25494,"S10 T27N R10E",0],["546969","Vernon","Clinton, Town of","2026-08-13","4",5,0,90000,"006-00359-0001",43.68023,-90.75678,"S17 T14N R3W",0],["1298195","Manitowoc","Meeme, Town of","2026-08-13","4",26.58,0,640000,"012-003-011-001.00",43.96986,-87.82564,"S3 T17N R22E",0],["874195","Oneida","Three Lakes, Town of","2026-08-12","5",23.6,0,39000,"TL-242",45.83796,-89.23377,"S22 T39N R10E",2030],["1298214","Manitowoc","Mishicot, Town of","2026-08-12","4",12.6,0,100664,"013-104-010-001.00",44.31741,-87.58802,"S4 T21N R24E",0],["1639789","Washington","Hartford, Town of","2026-08-12","5",16,0,220000,"T6-0296",43.33268,-88.31023,"S14 T10N R18E",0],["2735383","Racine","Raymond, Village of","2026-08-12","5",18.6,0,350000,"168-04-21-28-002-020",42.78239,-88.01397,"S28 T4N R21E",0],["941795","Waupaca","Larrabee, Town of","2026-08-12","4",5.99,0,130000,"10  36 12  1",44.59256,-88.73178,"S36 T25N R14E",0],["546899","Vernon","Sterling, Town of","2026-08-11","5",39.5,0,400000,"032-00645-0000",43.46301,-91.01453,"S31 T12N R5W",0],["643253","Green","Mount Pleasant, Town of","2026-08-11","4",6,0,400000,"23022 0633.1000",42.68102,-89.55183,"S33 T3N R8E",0],["957349","Douglas","Cloverland, Town of","2026-08-10","6",39,0,69000,"CL-008-00067-00",46.66339,-91.65928,"S5 T48N R10W",0],["957350","Douglas","Cloverland, Town of","2026-08-10","6",39,0,69000,"CL-008-00067-00",46.66339,-91.63821,"S4 T48N R10W",0],["360626","Crawford","Seneca, Town of","2026-08-10","4",13.97,0,360000,"12-018-0180-0000",43.26027,-90.97286,"S9 T9N R5W",0],["873980","Oneida","Newbold, Town of","2026-08-10","5",8.47,0,400000,"NE-316",45.6497,-89.548,"S30 T37N R8E",0],["345568","Richland","Orion, Town of","2026-08-10","4",40,0,1200000,"020-2713-0000",43.21683,-90.35751,"S27 T9N R1E",0],["481911","Langlade","Parrish, Town of","2026-08-10","6",10,0,48000,"018-0389",45.38903,-89.32562,"S25 T34N R9E",0],["493308","Trempealeau","Preston, Town of","2026-08-10","5M",40,0,500000,"024-00622-0000",44.27397,-91.1841,"S23 T21N R7W",0],["925094","Portage","Buena Vista, Town of","2026-08-10","6",40,0,290000,"010-22-0924-09",44.36086,-89.34513,"S24 T22N R9E",0],["1227056","Fond du Lac","Empire, Town of","2026-08-10","5",24.85,0,575000,"T08-15-18-23-15-001-00",43.75264,-88.29543,"S23 T15N R18E",0],["922692","Barron","Prairie Farm, Town of","2026-08-10","6",33.2,0,790000,"034-3200-04-010",45.20078,-91.99651,"S32 T32N R13W",0],["343497","Marquette","Crystal Lake, Town of","2026-08-07","5",35,0,600000,"004-00169-0000",43.96986,-89.23175,"S1 T17N R10E",0],["371480","Ashland","White River, Town of","2026-08-07","6",40,40,425000,"026-00103-0000",46.41721,-90.77295,"S32 T46N R3W",0],["1942357","Marathon","Bern, Town of","2026-08-07","4",35.39,0,9700,"006-3003-211-0991",45.05596,-90.1302,"S21 T30N R3E",0],["377853","Rusk","Hubbard, Town of","2026-08-07","5",10.62,0,59000,"020-00788-0130",45.54833,-91.22173,"S34 T36N R7W",0],["1211944","St. Croix","Baldwin, Town of","2026-08-07","6",30,0,200000,"002-1085-50-000",44.94011,-92.33657,"S33 T29N R16W",0],["1226934","Fond du Lac","Friendship, Town of","2026-08-07","4",21,0,480000,"T11-16-17-20-02-002-00",43.83953,-88.47272,"S20 T16N R17E",0],["947214","Polk","Black Brook, Town of","2026-08-07","6",15.22,0,140000,"010-00646-0000",45.21526,-92.28422,"S25 T32N R16W",0],["1211286","St. Croix","Eau Galle, Town of","2026-08-07","5",35,0,500000,"008-1094-20-000",44.85322,-92.33369,"S33 T28N R16W",0],["873920","Oneida","Nokomis, Town of","2026-08-07","6",40,40,120000,"NO-256-A",45.59177,-89.77617,"S17 T36N R6E",0],["774244","Juneau","Clearfield, Town of","2026-08-07","4",113.69,0,1051458,"290040929",43.91193,-90.15603,"S29 T17N R3E",0],["774259","Juneau","Necedah, Town of","2026-08-07","4",18,0,210000,"290280208",44.04227,-90.0951,"S11 T18N R3E",0],["420464","Washburn","Evergreen, Town of","2026-08-07","4",17.73,0,30000,"65-020-2-39-13-33-4 02-000-003000",45.80899,-91.99282,"S33 T39N R13W",0],["673418","Clark","Mentor, Town of","2026-08-07","5M",19,0,50000,"040.0100.000",44.5636,-90.86321,"S9 T24N R4W",0],["377818","Rusk","Conrath, Village of","2026-08-06","5",5,0,325000,"111-00236-0000",45.37455,-91.03406,"S31 T34N R5W",0],["997460","Columbia","Fountain Prairie, Town of","2026-08-06","4",40,0,2019665,"11014 652",43.37612,-89.0844,"S32 T11N R12E",0],["181096","Iron","Oma, Town of","2026-08-06","5",30,0,219000,"014-0136-0000",46.37377,-90.16503,"S18 T45N R3E",0],["1375958","Dodge","Lowell, Town of","2026-08-05","4",33.29,0,1007550,"032-1014-0421-000",43.36164,-88.82622,"S4 T10N R14E",0],["546820","Vernon","Coon, Town of","2026-08-05","5M",10.63,0,250000,"008-00197-0002",43.69471,-90.9768,"S9 T14N R5W",0],["360584","Crawford","Gays Mills, Village of","2026-08-05","5",16.4,0,145000,"12-131-0008-0002",43.3182,-90.85416,"S21 T10N R4W",0],["2026R-613268","Bayfield","Delta, Town of","2026-08-05","6",40,0,70000,"04-016-2-46-07-02-4 01-000-10000",46.48962,-91.21437,"S2 T46N R7W",0],["673380","Clark","Fremont, Town of","2026-08-05","4",40,0,452000,"014.0184.000",44.65048,-90.35582,"S10 T25N R1E",0],["2005385","Kenosha","Pleasant Prairie, Village of","2026-08-05","4",17,0,497000,"92-4-122-272-0105",42.52172,-87.88676,"S27 T1N R22E",0],["785881","Oconto","Chase, Town of","2026-08-05","4",40,0,995000,"012-050501212",44.75185,-88.19783,"S5 T26N R19E",0],["497773","Burnett","Wood River, Town of","2026-08-05","4",40,0,200000,"07-042-2-38-18-18-1 02-000-011000",45.76555,-92.65476,"S18 T38N R18W",0],["1510760","Jefferson","Waterloo, Town of","2026-08-05","4",13.5,0,37500,"030-0813-1743-001",43.1589,-88.97027,"S17 T8N R13E",0],["785863","Oconto","Mountain, Town of","2026-08-04","6",40,40,615000,"029-292800111",45.12837,-88.53151,"S28 T31N R16E",0],["1942126","Marathon","Maine, Village of","2026-08-04","5M",5.58,0,390000,"146-3007-213-0997",45.05596,-89.63904,"S21 T30N R7E",0],["1972595","Winnebago","Black Wolf, Town of","2026-08-04","5",11,0,200000,"004-03400902",43.92642,-88.48994,"S19 T17N R17E",0],["396075","Iowa","Eden, Town of","2026-08-04","6",6.67,0,405000,"010 0060.A",42.99961,-90.31822,"S12 T6N R1E",0],["2026R-613188","Bayfield","Orienta, Town of","2026-08-03","6",10,0,90000,"04-036-2-49-08-28-3 04-000-20000",46.69236,-91.38594,"S28 T49N R8W",0],["413419","Price","Kennan, Town of","2026-08-03","4",40,0,200000,"50-022-2-35-02-03-3-04-000-10000",45.53385,-90.60237,"S3 T35N R2W",0],["922494","Barron","Sumner, Town of","2026-08-03","5M",40,0,390000,"046-3300-20-000",45.37455,-91.6103,"S33 T34N R10W",0],["599268","Adams","Monroe, Town of","2026-08-03","4",15,0,2105000,"018-00386-0000",44.12915,-89.93348,"S7 T19N R5E",0],["774241","Juneau","Armenia, Town of","2026-08-03","5",5.01,0,78000,"290021823.10",44.07123,-90.05469,"S31 T19N R4E",0],["1852644","La Crosse","Farmington, Town of","2026-08-03","5",40.52,0,1400000,"5-01175-000",43.99882,-91.1002,"S28 T18N R6W",0],["774240","Juneau","Armenia, Town of","2026-08-03","5",5.01,0,55000,"290021823.10",44.07123,-90.05469,"S31 T19N R4E",0],["1211080","St. Croix","Eau Galle, Town of","2026-08-03","5",10.81,0,115000,"008-1007-20-000",44.92563,-92.31567,"S3 T28N R16W",0],["599269","Adams","Monroe, Town of","2026-08-03","4",39,0,300000,"018-00433-0010",44.12915,-89.91334,"S8 T19N R5E",0],["947423","Polk","Osceola, Town of","2026-08-02","4",12.9,0,72000,"042-00208-0100",45.34559,-92.57647,"S10 T33N R18W",0],["493074","Trempealeau","Arcadia, Town of","2026-07-31","5",40,0,236640,"004-02582-0000",44.1726,-91.56577,"S27 T20N R10W",0],["2198511","Sheboygan","Sheboygan Falls, Town of","2026-07-31","4",53.47,0,594000,"59026382450",43.7816,-87.87389,"S8 T15N R22E",0],["1134063","Walworth","Spring Prairie, Town of","2026-07-31","6",5.23,0,275000,"OA502500001",42.75342,-88.33012,"S2 T3N R18E",0],["947067","Polk","Garfield, Town of","2026-07-31","4",38.93,0,800000,"024-00059-0000",45.36007,-92.47414,"S4 T33N R17W",0],["886572","Door","Gibraltar, Town of","2026-07-31","4",20.2,0,329000,"014-0113302734A",45.07044,-87.12098,"S13 T30N R27E",0],["493072","Trempealeau","Arcadia, Town of","2026-07-31","5",9.49,0,370605,"004-02565-0000",44.1726,-91.54561,"S26 T20N R10W",0],["1297909","Manitowoc","Liberty, Town of","2026-07-31","4",32.06,0,349000,"008-036-016-001.00",43.98434,-87.78482,"S36 T18N R22E",0],["2026R-613179","Bayfield","Mason, Town of","2026-07-31","4",13.89,0,133000,"04-032-2-46-06-24-2 02-000-14000",46.44617,-91.06688,"S24 T46N R6W",0],["493075","Trempealeau","Arcadia, Town of","2026-07-31","5",40,0,379865,"004-02560-0000",44.1726,-91.54561,"S26 T20N R10W",0],["343446","Marquette","Moundville, Town of","2026-07-31","4",40,0,300000,"014-00229-0000",43.68023,-89.41745,"S16 T14N R9E",0],["922438","Barron","Turtle Lake, Town of","2026-07-31","5",20,0,150000,"048-0500-19-000",45.36007,-92.12437,"S5 T33N R14W",0],["6117247","Dane","Berry, Town of","2026-07-31","4",34.8,0,2200000,"004/080723385010",43.14442,-89.62448,"S23 T8N R7E",0],["249224","Forest","Nashville, Town of","2026-07-31","6",50.33,0,575000,"022-01170-0000",45.43248,-88.85095,"S11 T34N R13E",0],["600100","Calumet","Chilton, Town of","2026-07-30","4",38.5,0,539000,"008-0000-0000000-000-0-191926-00-230A",44.08571,-88.1627,"S26 T19N R19E",0],["902808","Marinette","Pound, Town of","2026-07-30","6",39.7,0,158960,"028-00227.000",45.07044,-88.06262,"S17 T30N R20E",0],["377796","Rusk","Stubbs, Town of","2026-07-30","5",42.9,0,330000,"036-00003-0000",45.44696,-91.28212,"S6 T34N R7W",0],["2026R-613192","Bayfield","Kelly, Town of","2026-07-30","6",40,0,535000,"04-026-2-46-05-27-1 03-000-10000",46.43169,-90.9828,"S27 T46N R5W",0],["799160","Shawano","Washington, Town of","2026-07-30","6",39.55,0,280000,"044-01320-0000",44.83874,-88.35758,"S1 T27N R17E",0],["972869","Chippewa","Wheaton, Town of","2026-07-30","4",40,0,1680000,"22809-1731-00000000",44.89667,-91.49839,"S17 T28N R9W",0],["799426","Shawano","Aniwa, Town of","2026-07-30","5M",27.3,0,54600,"006-19430-0000",44.96907,-89.19068,"S19 T29N R11E",0],["399137","Taylor","Taft, Town of","2026-07-30","5",40,0,200000,"042-00464-0000",45.04148,-90.82591,"S26 T30N R4W",0],["1226803","Fond du Lac","Friendship, Town of","2026-07-29","4",6.3,0,109900,"T11-16-17-17-01-005-00",43.85401,-88.47224,"S17 T16N R17E",0],["181072","Iron","Kimball, Town of","2026-07-27","5",40,0,70000,"008-0640-0000",46.44617,-90.22762,"S22 T46N R2E",0],["774166","Juneau","Lisbon, Town of","2026-07-27","5",12.35,0,40000,"290221052",43.81056,-90.07636,"S36 T16N R3E",0],["424988","Jackson","Springfield, Town of","2026-07-24","5",25,0,165000,"042-0103.0005",44.30293,-91.14408,"S7 T21N R6W",0],["481728","Langlade","Elcho, Town of","2026-07-22","6",40,0,255900,"008-0639",45.37455,-89.20243,"S36 T34N R10E",0],["886847","Door","Nasewaupee, Town of","2026-07-22","4",39.92,0,1800000,"020-0119272543",44.7953,-87.48312,"S19 T27N R25E",0],["481726","Langlade","Elcho, Town of","2026-07-22","6",40,0,107500,"008-0499",45.38903,-89.24328,"S27 T34N R10E",0],["481787","Langlade","Summit, Town of","2026-07-16","6",40,0,168000,"028-0238",45.33111,-89.36788,"S15 T33N R9E",0],["947494","Polk","Luck, Town of","2026-07-14","5",39.48,0,1325000,"036-00859-0000",45.54833,-92.46035,"S34 T36N R17W",0],["799492","Shawano","Shawano, City of","2026-07-13","5",19.6,0,272000,"281-33440-0000",44.76633,-88.54343,"S33 T27N R16E",0],["431275","Green Lake","Marquette, Town of","2026-07-02","5M",36,0,6000,"014-00761-0000",43.73816,-89.09632,"S30 T15N R12E",0],["249239","Forest","Nashville, Town of","2026-06-11","5",7.18,0,25000,"022-00744-0002",45.46144,-89.03565,"S32 T35N R12E",126],["634412","Pierce","Union, Town of","2026-06-08","6",17,0,434700,"034-01045-0800",44.62152,-92.22451,"S20 T25N R15W",0],["1510566","Jefferson","Oakland, Town of","2026-05-27","5",20.33,0,76000,"022-0613-0833-000",42.99961,-88.97405,"S8 T6N R13E",0],["498092","Burnett","West Marshland, Town of","2026-05-22","4",39.5,0,80000,"07-040-2-39-18-06-2 04-000-011000",45.8814,-92.65941,"S6 T39N R18W",0],["903373","Marinette","Wagner, Town of","2026-04-10","5",39.8,0,43333,"034-00972.000",45.34559,-87.6809,"S8 T33N R23E",0],["903374","Marinette","Wagner, Town of","2026-03-24","5",39.8,0,21667,"034-00972.000",45.34559,-87.6809,"S8 T33N R23E",0]]};var defs={"http":function(module,exports,require){
+'use strict';
+
+// fetch + JSON parse with a timeout. Throws a labeled Error on network
+// failure, HTTP error, non-JSON body, or an ArcGIS-style { error } payload,
+// so a failed call can never be read as "no data".
+async function fetchJson(url, options = {}, { label = 'Request', timeoutMs = 12000 } = {}) {
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), timeoutMs);
+    let res, text;
+    try {
+        res = await fetch(url, { ...options, signal: ctl.signal });
+        text = await res.text();
+    } catch (e) {
+        throw new Error(e.name === 'AbortError'
+            ? `${label} did not respond within ${timeoutMs / 1000} s.`
+            : `${label} unreachable: ${e.message}`);
+    } finally {
+        clearTimeout(timer);
+    }
+    let data;
+    try {
+        data = text ? JSON.parse(text) : {};
+    } catch {
+        throw new Error(`${label} returned HTTP ${res.status} with a non-JSON body: ${text.slice(0, 160)}`);
+    }
+    if (!res.ok) {
+        const msg = (data && (data.error && data.error.message || data.message)) || text.slice(0, 160);
+        throw new Error(`${label} returned HTTP ${res.status}: ${msg}`);
+    }
+    if (data && data.error) {
+        const detail = (data.error.details || []).join(' ');
+        throw new Error(`${label} error ${data.error.code || ''}: ${data.error.message}${detail ? ' (' + detail + ')' : ''}`);
+    }
+    return data;
+}
+
+module.exports = { fetchJson };
+
+},
+"geo":function(module,exports,require){
+'use strict';
+
+// Minimal geometry helpers for GeoJSON Polygon / MultiPolygon in WGS84.
+
+const M_PER_DEG = 111320;
+
+function polygonsOf(g) {
+    if (!g) return [];
+    if (g.type === 'Polygon') return [g.coordinates];
+    if (g.type === 'MultiPolygon') return g.coordinates;
+    return [];
+}
+
+function bbox(g) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const poly of polygonsOf(g)) for (const ring of poly) for (const [x, y] of ring) {
+        if (x < minX) minX = x; if (y < minY) minY = y;
+        if (x > maxX) maxX = x; if (y > maxY) maxY = y;
+    }
+    if (!Number.isFinite(minX)) throw new Error('Parcel has no polygon geometry.');
+    return [minX, minY, maxX, maxY];
+}
+
+function inRing(x, y, ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const [xi, yi] = ring[i], [xj, yj] = ring[j];
+        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+}
+
+function pointInGeometry(x, y, g) {
+    return polygonsOf(g).some(([outer, ...holes]) => inRing(x, y, outer) && !holes.some(h => inRing(x, y, h)));
+}
+
+// Approximate distance in meters from a point to the polygon boundary (0 if inside).
+function distanceMeters(x, y, g) {
+    if (pointInGeometry(x, y, g)) return 0;
+    const kx = M_PER_DEG * Math.cos(y * Math.PI / 180), ky = M_PER_DEG;
+    let best = Infinity;
+    for (const poly of polygonsOf(g)) for (const ring of poly) {
+        for (let i = 0; i < ring.length - 1; i++) {
+            const ax = (ring[i][0] - x) * kx, ay = (ring[i][1] - y) * ky;
+            const bx = (ring[i + 1][0] - x) * kx, by = (ring[i + 1][1] - y) * ky;
+            const dx = bx - ax, dy = by - ay, len2 = dx * dx + dy * dy;
+            const t = len2 ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / len2)) : 0;
+            const px = ax + t * dx, py = ay + t * dy;
+            best = Math.min(best, Math.hypot(px, py));
+        }
+    }
+    return best;
+}
+
+function expandBbox([minX, minY, maxX, maxY], meters) {
+    const midLat = (minY + maxY) / 2;
+    const dLat = meters / M_PER_DEG, dLng = meters / (M_PER_DEG * Math.cos(midLat * Math.PI / 180));
+    return [minX - dLng, minY - dLat, maxX + dLng, maxY + dLat];
+}
+
+// WKT for SQL Server geometry::STGeomFromText. Numbers fixed to 7 decimals
+// (~1 cm), so no exponent notation and no injectable characters.
+function toWkt(g) {
+    const polys = polygonsOf(g);
+    if (!polys.length) throw new Error('Parcel has no polygon geometry.');
+    const ring = r => '(' + r.map(([x, y]) => `${Number(x).toFixed(7)} ${Number(y).toFixed(7)}`).join(', ') + ')';
+    const poly = p => '(' + p.map(ring).join(', ') + ')';
+    return polys.length === 1 ? 'POLYGON' + poly(polys[0]) : 'MULTIPOLYGON(' + polys.map(poly).join(', ') + ')';
+}
+
+module.exports = { bbox, pointInGeometry, distanceMeters, expandBbox, toWkt };
+
+},
+"plss":function(module,exports,require){
+'use strict';
+
+// Approximate WGS84 location of a Wisconsin PLSS section center.
+// Townships count north from the WI-IL baseline (42.5 N); ranges count
+// east/west from the 4th Principal Meridian (90 25' 37" W). Townships are
+// 6 miles square; sections are numbered boustrophedon from the NE corner.
+// Surveyed lines drift from this ideal grid, so expect ~0.5-1.5 km error:
+// fine for "comps within N miles", not for boundaries.
+
+const BASELINE_LAT = 42.5;
+const PM_LNG = -(90 + 25 / 60 + 37 / 3600);
+const TOWNSHIP_M = 9656.064;
+const M_PER_DEG_LAT = 111132;
+
+function sectionCenter(section, township, range, meridian) {
+    const s = Number(section), t = Number(township), r = Number(range);
+    if (!(s >= 1 && s <= 36) || !(t >= 1) || !(r >= 1)) return null;
+    const dir = String(meridian || '').toUpperCase().startsWith('W') ? -1 : 1;
+    const row = Math.floor((s - 1) / 6);                     // 0 = north row
+    const col = row % 2 === 0 ? 5 - ((s - 1) % 6) : (s - 1) % 6;  // 0 = west column
+    const northM = (t - 1) * TOWNSHIP_M + (5 - row + 0.5) / 6 * TOWNSHIP_M;
+    const lat = BASELINE_LAT + northM / M_PER_DEG_LAT;
+    const eastM = dir > 0 ? (r - 1) * TOWNSHIP_M + (col + 0.5) / 6 * TOWNSHIP_M
+                          : -(r * TOWNSHIP_M) + (col + 0.5) / 6 * TOWNSHIP_M;
+    const lng = PM_LNG + eastM / (111320 * Math.cos(lat * Math.PI / 180));
+    return { lat, lng };
+}
+
+module.exports = { sectionCenter };
+
+},
+"parcel":function(module,exports,require){
+'use strict';
+
+// Re-fetch the parcel by OBJECTID from the statewide layer, so every
+// downstream lookup runs on the authoritative record and geometry rather
+// than on anything the browser sends.
+
+const { fetchJson } = require('./http');
+
+const PARCEL_SVC = 'https://services3.arcgis.com/n6uYoouQZW75n5WI/arcgis/rest/services/Wisconsin_Statewide_Parcels_DB/FeatureServer/0/query';
+
+async function fetchParcel(objectId) {
+    const params = new URLSearchParams({
+        objectIds: String(objectId), outFields: '*', returnGeometry: 'true', outSR: '4326',
+        maxAllowableOffset: '0.00002', geometryPrecision: '7', f: 'geojson'
+    });
+    const data = await fetchJson(`${PARCEL_SVC}?${params}`, {}, { label: 'Statewide parcel service' });
+    const feature = Array.isArray(data.features) ? data.features[0] : null;
+    if (!feature) return null;
+    if (!feature.geometry) throw new Error('Statewide parcel record has no geometry.');
+    return feature;
+}
+
+module.exports = { fetchParcel, PARCEL_SVC };
+
+},
+"ownership":function(module,exports,require){
+'use strict';
+
+// Absentee-owner check from the county record alone: mailing address
+// (PSTLADRESS) vs. site address (SITEADRESS), plus improvement value.
+
+const SUFFIXES = new Set(['RD', 'ROAD', 'ST', 'STREET', 'AVE', 'AVENUE', 'LN', 'LANE', 'DR', 'DRIVE', 'CT', 'COURT',
+    'HWY', 'HIGHWAY', 'CTY', 'COUNTY', 'TRL', 'TRAIL', 'BLVD', 'PL', 'CIR', 'WAY', 'N', 'S', 'E', 'W', 'RR']);
+
+const norm = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+
+function mailingStateZip(addr) {
+    const m = norm(addr).match(/\b([A-Z]{2}) (\d{5})(?: \d{4})?$/);
+    return m ? { state: m[1], zip: m[2] } : null;
+}
+
+// Same house number and at least one shared street-name word.
+function sameStreetAddress(site, mail) {
+    const s = norm(site).split(' '), m = norm(mail).split(' ');
+    if (!s.length || !m.length) return null;
+    if (/\d/.test(s[0]) && /\d/.test(m[0])) {
+        if (s[0] !== m[0]) return false;
+        const words = new Set(s.slice(1).filter(w => w.length > 1 && !SUFFIXES.has(w)));
+        return words.size === 0 ? true : m.slice(1).some(w => words.has(w));
+    }
+    return norm(mail).startsWith(norm(site)) ? true : null;
+}
+
+function analyzeOwnership(p) {
+    const mail = norm(p.PSTLADRESS), site = norm(p.SITEADRESS);
+    const improved = Number(p.IMPVALUE) > 0;
+    const loc = mailingStateZip(p.PSTLADRESS);
+    const base = { mailingAddress: p.PSTLADRESS || null, siteAddress: p.SITEADRESS || null, mailingState: loc && loc.state };
+
+    if (!mail) {
+        return { ...base, status: 'unknown', label: 'Cannot determine', reasons: ['No mailing address on the county record.'] };
+    }
+    if (loc && loc.state !== 'WI') {
+        return { ...base, status: 'absentee', label: `Absentee (out of state: ${loc.state})`, reasons: [`Tax bill mails to ${loc.state}.`] };
+    }
+    if (site) {
+        const same = sameStreetAddress(site, mail);
+        if (same === true) return { ...base, status: 'resident', label: 'Likely owner-occupied', reasons: ['Mailing address matches the site address.'] };
+        if (same === false) return { ...base, status: 'absentee', label: 'Absentee (in state)', reasons: ['Mailing address differs from the site address.'] };
+        return { ...base, status: 'unknown', label: 'Cannot determine', reasons: ['Site and mailing addresses could not be compared reliably.'] };
+    }
+    if (!improved) {
+        return { ...base, status: 'absentee', label: 'Absentee (vacant land)',
+            reasons: ['No site address and no improvement value on record, so no residence exists on this parcel.'] };
+    }
+    return { ...base, status: 'unknown', label: 'Cannot determine', reasons: ['Improvements are recorded but there is no site address to compare.'] };
+}
+
+module.exports = { analyzeOwnership, sameStreetAddress, mailingStateZip };
+
+},
+"mfl":function(module,exports,require){
+'use strict';
+
+// Managed Forest Law / Forest Crop Law enrollment from the WI DNR
+// "Wisconsin Tax Law Points" layer. Each point is one enrolled PLSS
+// quarter-quarter (QQ), placed at the QQ center, not on the exact land.
+// A QQ is ~400 m square, so any QQ touching the parcel has its point within
+// ~285 m of the parcel; a 300 m search catches all of them.
+
+const { fetchJson } = require('./http');
+const { bbox, expandBbox, pointInGeometry, distanceMeters } = require('./geo');
+
+const TAXLAW_SVC = 'https://services5.arcgis.com/Ul9AyFFeFTjf08DW/arcgis/rest/services/X13661_FR_GIS_TAXLAW_PT_SV/FeatureServer/0/query';
+const SEARCH_M = 300;
+const MATCH_RANK = { 'parcel number': 2, 'location': 1 };
+
+const idNorm = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+function parcelIdsMatch(a, b) {
+    a = idNorm(a); b = idNorm(b);
+    if (!a || !b) return false;
+    if (a === b) return true;
+    const [short, long] = a.length < b.length ? [a, b] : [b, a];
+    return short.length >= 7 && long.endsWith(short);
+}
+const expirationYear = (s) => { const m = String(s || '').match(/(\d{4})\s*$/); return m ? Number(m[1]) : null; };
+const num = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) ? null : Number(v);
+const ACCESS = { O: 'Open to public', C: 'Closed to public' };
+
+async function lookupTaxLaw(parcel, { now = new Date() } = {}) {
+    const p = parcel.properties, g = parcel.geometry;
+    const box = expandBbox(bbox(g), SEARCH_M);
+    const params = new URLSearchParams({
+        geometry: box.map(n => n.toFixed(7)).join(','), geometryType: 'esriGeometryEnvelope',
+        inSR: '4326', outSR: '4326', spatialRel: 'esriSpatialRelIntersects',
+        outFields: '*', returnGeometry: 'true', resultRecordCount: '500', f: 'json'
+    });
+    const data = await fetchJson(`${TAXLAW_SVC}?${params}`, {}, { label: 'DNR tax-law service' });
+    if (!Array.isArray(data.features)) throw new Error('DNR tax-law service returned an unexpected response.');
+
+    const county = String(p.CONAME || '').toUpperCase();
+    const year = now.getFullYear();
+    const orders = new Map();
+
+    for (const f of data.features) {
+        const a = f.attributes || {}, x = f.geometry && f.geometry.x, y = f.geometry && f.geometry.y;
+        if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+        const sameCounty = !county || !a.CNTY_NAME || String(a.CNTY_NAME).toUpperCase() === county;
+        const idMatch = sameCounty && [p.PARCELID, p.TAXPARCELID].some(id => parcelIdsMatch(a.PARCEL_NO, id));
+        const match = idMatch ? 'parcel number' : pointInGeometry(x, y, g) ? 'location' : null;
+        const dist = Math.round(distanceMeters(x, y, g));
+
+        const key = a.ORDER_NO || `FID-${a.FID}`;
+        if (!orders.has(key)) {
+            const expYear = expirationYear(a.ORDER_EXP);
+            orders.set(key, {
+                orderNo: a.ORDER_NO || null, program: a.TAX_TYPE || null, county: a.CNTY_NAME || null,
+                entryYear: a.ENTRY_YEAR || null, expires: a.ORDER_EXP || null, expirationYear: expYear,
+                yearsRemaining: expYear ? expYear - year : null, ownerType: a.OWNER_TEXT || null,
+                orderAcres: { open: num(a.AC_OP_ORD), closed: num(a.AC_CL_ORD), total: num(a.AC_TOT_ORD) },
+                match: null, nearestMeters: dist, tracts: []
+            });
+        }
+        const o = orders.get(key);
+        if (match && (!o.match || MATCH_RANK[match] > MATCH_RANK[o.match])) o.match = match;
+        o.nearestMeters = Math.min(o.nearestMeters, dist);
+        o.tracts.push({ description: a.DTRSLD_TXT || a.LEGAL_DESC || null, countyParcelNo: a.PARCEL_NO || null,
+            acres: num(a.AC_TOT_PLS), access: ACCESS[a.ACCESS] || a.ACCESS || null, match, distanceMeters: dist });
+    }
+
+    const all = [...orders.values()];
+    const matched = all.filter(o => o.match).sort((a, b) => MATCH_RANK[b.match] - MATCH_RANK[a.match]);
+    const nearby = all.filter(o => !o.match).sort((a, b) => a.nearestMeters - b.nearestMeters).slice(0, 5);
+    return {
+        status: matched.length ? 'enrolled' : 'none_found',
+        matched, nearby, searchRadiusMeters: SEARCH_M,
+        truncated: Boolean(data.exceededTransferLimit),
+        method: 'DNR tax-law points mark enrolled quarter-quarters at their center. Matched by county parcel number, or by the point falling inside this parcel.'
+    };
+}
+
+module.exports = { lookupTaxLaw, parcelIdsMatch, expirationYear, TAXLAW_SVC };
+
+},
+"soils":function(module,exports,require){
+'use strict';
+
+// Soils and forest productivity from USDA NRCS Soil Data Access (SSURGO).
+// 1) Clip soil map units to the parcel polygon to get acres per map unit.
+// 2) Pull components and forest-productivity ratings (coforprod) for them.
+// 3) Area-weight site index by species, in code.
+
+const { fetchJson } = require('./http');
+const { toWkt } = require('./geo');
+
+const SDA_URL = 'https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest';
+const SQ_M_TO_ACRES = 0.000247105;
+
+async function sda(query) {
+    const data = await fetchJson(SDA_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query, format: 'JSON+COLUMNNAME' })
+    }, { label: 'USDA Soil Data Access', timeoutMs: 15000 });
+    const table = data.Table;
+    if (!Array.isArray(table) || table.length < 1) return [];
+    const [cols, ...rows] = table;
+    return rows.map(r => Object.fromEntries(cols.map((c, i) => [c, r[i]])));
+}
+
+const num = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) ? null : Number(v);
+const round = (v, d = 1) => v === null ? null : Math.round(v * 10 ** d) / 10 ** d;
+
+function clipQuery(wkt) {
+    return `~DeclareGeometry(@aoi)~
+select @aoi = geometry::STGeomFromText('${wkt}', 4326).MakeValid()
+~DeclareIdGeomTable(@intersectedPolygonGeometries)~
+~GetClippedMapunits(@aoi,polygon,geo,@intersectedPolygonGeometries)~
+~DeclareIdGeogTable(@intersectedPolygonGeographies)~
+~GetGeogFromGeomWgs84(@intersectedPolygonGeometries,@intersectedPolygonGeographies)~
+select id as mukey, sum(geog.STArea()) * ${SQ_M_TO_ACRES} as acres
+from @intersectedPolygonGeographies group by id`;
+}
+
+function attributeQuery(mukeys) {
+    return `select mu.mukey, mu.musym, mu.muname, ma.drclassdcd,
+  c.cokey, c.compname, c.comppct_r, c.majcompflag,
+  fp.plantsym, fp.plantcomname, fp.siteindexbase, fp.siteindex_r, fp.fprod_r
+from mapunit mu
+left join muaggatt ma on ma.mukey = mu.mukey
+inner join component c on c.mukey = mu.mukey
+left join coforprod fp on fp.cokey = c.cokey
+where mu.mukey in (${mukeys.join(',')})
+order by mu.mukey, c.comppct_r desc`;
+}
+
+async function lookupSoils(parcel) {
+    const wkt = toWkt(parcel.geometry);
+    let acresByMukey = null, clipError = null, mukeys;
+
+    try {
+        const rows = await sda(clipQuery(wkt));
+        acresByMukey = new Map(rows.map(r => [String(r.mukey), num(r.acres)]));
+        mukeys = [...acresByMukey.keys()];
+    } catch (e) {
+        // Fall back to map unit list without acreage rather than nothing.
+        clipError = e.message;
+        const rows = await sda(`select distinct mukey from SDA_Get_Mukey_from_intersection_with_WktWgs84('${wkt}')`);
+        mukeys = rows.map(r => String(r.mukey));
+    }
+    mukeys = mukeys.filter(k => /^\d{1,12}$/.test(k));
+    if (!mukeys.length) {
+        return { status: 'none', units: [], productivity: [], totalAcres: 0,
+            note: 'No SSURGO soil map units intersect this parcel (open water or unsurveyed area).' };
+    }
+
+    const rows = await sda(attributeQuery(mukeys));
+    const units = new Map();
+    for (const r of rows) {
+        const key = String(r.mukey);
+        if (!units.has(key)) {
+            units.set(key, { mukey: key, symbol: r.musym || null, name: r.muname || null, drainage: r.drclassdcd || null,
+                acres: acresByMukey ? round(acresByMukey.get(key), 2) : null, components: new Map() });
+        }
+        const u = units.get(key);
+        if (!u.components.has(r.cokey)) {
+            u.components.set(r.cokey, { name: r.compname || null, percent: num(r.comppct_r),
+                major: r.majcompflag === 'Yes', siteIndex: [] });
+        }
+        const si = num(r.siteindex_r);
+        if (si !== null) {
+            u.components.get(r.cokey).siteIndex.push({ species: r.plantcomname || r.plantsym || null, symbol: r.plantsym || null,
+                siteIndex: si, method: r.siteindexbase || null, productivityFt3AcYr: num(r.fprod_r) });
+        }
+    }
+
+    const list = [...units.values()].map(u => ({ ...u, components: [...u.components.values()] }));
+    const totalAcres = acresByMukey ? round(list.reduce((s, u) => s + (u.acres || 0), 0), 2) : null;
+    for (const u of list) u.percentOfParcel = totalAcres ? round(100 * (u.acres || 0) / totalAcres, 1) : null;
+    list.sort((a, b) => (b.acres || 0) - (a.acres || 0));
+
+    // Area-weighted site index per species and method (different methods
+    // are not comparable, so they are kept separate). weight = map unit
+    // acres x component percent.
+    const productivity = [];
+    if (acresByMukey) {
+        const agg = new Map();
+        for (const u of list) for (const c of u.components) for (const s of c.siteIndex) {
+            const w = (u.acres || 0) * (c.percent || 0) / 100;
+            if (!w) continue;
+            const k = `${s.symbol}|${s.method}`;
+            const a = agg.get(k) || { species: s.species, symbol: s.symbol, method: s.method, w: 0, si: 0, fw: 0, fp: 0 };
+            a.w += w; a.si += w * s.siteIndex;
+            if (s.productivityFt3AcYr !== null) { a.fw += w; a.fp += w * s.productivityFt3AcYr; }
+            agg.set(k, a);
+        }
+        for (const a of agg.values()) {
+            productivity.push({ species: a.species, symbol: a.symbol, method: a.method,
+                siteIndex: Math.round(a.si / a.w), ratedAcres: round(a.w, 1),
+                productivityFt3AcYr: a.fw ? Math.round(a.fp / a.fw) : null });
+        }
+        productivity.sort((a, b) => b.ratedAcres - a.ratedAcres);
+    }
+
+    return {
+        status: acresByMukey ? 'ok' : 'partial',
+        units: list, productivity, totalAcres,
+        note: acresByMukey ? null : `Acreage by soil unit unavailable (${clipError}). Map units listed without area.`
+    };
+}
+
+module.exports = { lookupSoils, clipQuery, attributeQuery, SDA_URL };
+
+},
+"comps":function(module,exports,require){
+'use strict';
+
+// Comparable land sales from data/comps.json (built from WI DOR RETR files
+// by scripts/build-comps.js). Market evidence, not an appraisal: the card
+// shows each sale so a forester can judge it.
+
+const { bbox } = require('./geo');
+
+let data;
+try { data = __COMPS; } catch { data = null; }
+const rows = data ? data.rows.map(r => Object.fromEntries(data.fields.map((f, i) => [f, r[i]]))) : [];
+
+const USES = new Set(['6', '5M', '5']);           // forest, ag forest, undeveloped
+const USE_LABEL = { '6': 'Productive forest', '5M': 'Agricultural forest', '5': 'Undeveloped', '4': 'Agricultural' };
+const RADII_MILES = [15, 30, 50];
+const MIN_COMPS = 5, MAX_COMPS = 12;
+
+const milesBetween = (a, b) => {
+    const k = Math.cos(((a.lat + b.lat) / 2) * Math.PI / 180);
+    return Math.hypot((a.lat - b.lat) * 69.05, (a.lng - b.lng) * 69.17 * k);
+};
+function percentile(sorted, p) {
+    const i = (sorted.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+}
+const num = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) ? null : Number(v);
+
+function findComps(parcel) {
+    if (!data) throw new Error('Comparable sales data (data/comps.json) is not loaded.');
+    const p = parcel.properties;
+    const [minX, minY, maxX, maxY] = bbox(parcel.geometry);
+    const subject = { lat: (minY + maxY) / 2, lng: (minX + maxX) / 2 };
+    const subjectAcres = num(p.GISACRES) || num(p.DEEDACRES) || num(p.ASSDACRES);
+
+    const pool = rows.filter(r => USES.has(r.use)).map(r => ({ ...r, distanceMiles: milesBetween(subject, r) }));
+    const similarSize = (r) => !subjectAcres || (r.acres >= subjectAcres / 4 && r.acres <= subjectAcres * 4);
+
+    let chosen = [], radius = null, sizeMatched = false;
+    for (const rad of RADII_MILES) {
+        const near = pool.filter(r => r.distanceMiles <= rad);
+        const sized = near.filter(similarSize);
+        if (sized.length >= MIN_COMPS) { chosen = sized; radius = rad; sizeMatched = Boolean(subjectAcres); break; }
+        if (near.length >= MIN_COMPS || rad === RADII_MILES[RADII_MILES.length - 1]) { chosen = near; radius = rad; break; }
+    }
+    chosen = chosen.sort((a, b) => a.distanceMiles - b.distanceMiles).slice(0, MAX_COMPS);
+
+    const base = { coverage: data.coverage, source: data.source, filter: data.filter, subjectAcres,
+        method: 'Sale price ÷ deeded acres. Sale locations are PLSS section centers (about ±1 km).' };
+    if (!chosen.length) {
+        return { ...base, status: 'none', radiusMiles: radius, count: 0, comps: [],
+            note: `No qualifying land sales within ${radius} miles in the loaded data.` };
+    }
+    const ppa = chosen.map(c => c.price / c.acres).sort((a, b) => a - b);
+    const round = (v) => Math.round(v);
+    return {
+        ...base,
+        status: 'ok', radiusMiles: radius, count: chosen.length, sizeMatched,
+        pricePerAcre: {
+            median: round(percentile(ppa, 0.5)),
+            p25: chosen.length >= 4 ? round(percentile(ppa, 0.25)) : null,
+            p75: chosen.length >= 4 ? round(percentile(ppa, 0.75)) : null,
+            min: round(ppa[0]), max: round(ppa[ppa.length - 1])
+        },
+        comps: chosen.map(c => ({
+            date: c.date, county: c.county, municipality: c.municipality, use: USE_LABEL[c.use] || c.use,
+            acres: c.acres, mflAcres: c.mflAcres || 0, price: c.price, pricePerAcre: round(c.price / c.acres),
+            distanceMiles: Math.round(c.distanceMiles * 10) / 10, plss: c.plss, parcel: c.parcel, waterFt: c.waterFt || 0
+        }))
+    };
+}
+
+module.exports = { findComps };
+
+},
+"origin":function(module,exports,require){module.exports={handleCors:function(){return true}}},
+"evaluate":function(module,exports,require){
+'use strict';
+
+// Phase 1 parcel intelligence. Everything here is fetched or computed in
+// code from public sources; no model is involved.
+//
+//   POST { objectId, parcelId }  ->  ownership, MFL/FCL enrollment, soils,
+//                                    comparable land sales, lead signals
+//
+// Each section succeeds or fails on its own, and a failure is reported as
+// an error for that section, never as "none found".
+
+const { handleCors } = require('./origin');
+const { fetchParcel, PARCEL_SVC } = require('./parcel');
+const { analyzeOwnership } = require('./ownership');
+const { lookupTaxLaw, TAXLAW_SVC } = require('./mfl');
+const { lookupSoils, SDA_URL } = require('./soils');
+const { findComps } = require('./comps');
+
+const LEAD_MIN_ACRES = 40;
+const MFL_EXPIRING_YEARS = 5;
+
+const num = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) ? null : Number(v);
+const settled = (r) => r.status === 'fulfilled' ? { ok: true, ...r.value } : { ok: false, error: r.reason && r.reason.message || String(r.reason) };
+
+function leadSignals(p, ownership, mfl) {
+    const gis = num(p.GISACRES), deed = num(p.DEEDACRES);
+    const acres = gis !== null ? gis : deed;
+    const acresSource = gis !== null ? 'GIS acres' : 'deed acres';
+
+    const criteria = [
+        { key: 'acres', label: `${LEAD_MIN_ACRES}+ acres`,
+          met: acres === null ? null : acres >= LEAD_MIN_ACRES,
+          detail: acres === null ? 'Acreage not on record' : `${acres.toLocaleString('en-US', { maximumFractionDigits: 2 })} ac (${acresSource})` },
+        { key: 'absentee', label: 'Absentee owner',
+          met: ownership.status === 'absentee' ? true : ownership.status === 'resident' ? false : null,
+          detail: ownership.label },
+        { key: 'unenrolled', label: 'Not enrolled in MFL / Forest Crop',
+          met: !mfl.ok ? null : mfl.status === 'none_found',
+          detail: !mfl.ok ? 'Enrollment check failed' : mfl.status === 'enrolled'
+              ? `Enrolled: ${mfl.matched.map(o => o.orderNo).join(', ')}` : 'No enrollment matched this parcel' }
+    ];
+    const expiring = mfl.ok ? mfl.matched.filter(o => o.yearsRemaining !== null && o.yearsRemaining >= 0 && o.yearsRemaining <= MFL_EXPIRING_YEARS) : [];
+    const known = criteria.filter(c => c.met !== null);
+    return {
+        criteria,
+        allCriteriaMet: known.length === criteria.length && known.every(c => c.met),
+        expiringEnrollments: expiring.map(o => ({ orderNo: o.orderNo, expires: o.expires, yearsRemaining: o.yearsRemaining })),
+        note: 'Public records cannot show whether land is actively managed. "Not enrolled" is the closest public proxy.'
+    };
+}
+
+async function handler(req, res) {
+    res.setHeader('Cache-Control', 'no-store');
+    if (!handleCors(req, res)) return;
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed.' });
+
+    let body = req.body;
+    if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch { return res.status(400).json({ error: 'Body must be JSON.' }); }
+    }
+    const objectId = Number(body && body.objectId);
+    const parcelId = body && typeof body.parcelId === 'string' ? body.parcelId : null;
+    if (!Number.isInteger(objectId) || objectId <= 0) {
+        return res.status(400).json({ error: 'Request must include a numeric objectId from the statewide parcel layer.' });
+    }
+
+    let parcel;
+    try {
+        parcel = await fetchParcel(objectId);
+    } catch (e) {
+        return res.status(502).json({ error: e.message });
+    }
+    if (!parcel) return res.status(404).json({ error: `No statewide parcel with OBJECTID ${objectId}.` });
+    const p = parcel.properties;
+    if (parcelId && p.PARCELID && parcelId !== p.PARCELID) {
+        return res.status(409).json({ error: `Parcel mismatch: OBJECTID ${objectId} is ${p.PARCELID}, not ${parcelId}. Reload the parcel.` });
+    }
+
+    const ownership = analyzeOwnership(p);
+    const [mflResult, soilsResult] = await Promise.allSettled([lookupTaxLaw(parcel), lookupSoils(parcel)]);
+    const mfl = settled(mflResult), soils = settled(soilsResult);
+    let comps;
+    try { comps = { ok: true, ...findComps(parcel) }; } catch (e) { comps = { ok: false, error: e.message }; }
+
+    return res.status(200).json({
+        parcel: { objectId, parcelId: p.PARCELID || null, county: p.CONAME || null,
+            gisAcres: num(p.GISACRES), deedAcres: num(p.DEEDACRES), taxRollYear: p.TAXROLLYEAR || null },
+        ownership,
+        mfl,
+        soils,
+        comps,
+        lead: leadSignals(p, ownership, mfl),
+        sources: [
+            { name: 'Wisconsin Statewide Parcel Database (V12, 2026)', url: PARCEL_SVC.replace(/\/query$/, '') },
+            { name: 'WI DNR Tax Law Points (MFL / Forest Crop)', url: TAXLAW_SVC.replace(/\/query$/, '') },
+            { name: 'USDA NRCS Soil Data Access (SSURGO)', url: SDA_URL },
+            { name: 'WI DOR Real Estate Transfer Returns', url: 'https://revenue.wi.gov/Pages/ERETR/data-home.aspx' }
+        ],
+        generatedAt: new Date().toISOString()
+    });
+}
+
+module.exports = handler;
+module.exports.leadSignals = leadSignals;
+
+}};var cache={};
+function req(p){var k=p.replace(/^.*\//,"").replace(/\.js$/,"");if(cache[k])return cache[k].exports;var m={exports:{}};cache[k]=m;defs[k](m,m.exports,req);return m.exports}
+window.__defs=defs;window.__req=req;
+window.localEvaluate=async function(body){var out={code:200,data:null};var res={setHeader:function(){},status:function(c){out.code=c;return res},json:function(d){out.data=d;return res}};
+  await req("evaluate")({method:"POST",body:body},res);return out};})();
+</script>
+</head>
+<body>
+<div class="wrap">
+    <header>
+        <h1>Field Parcel Check</h1>
+        <p class="sub">Stand on a property, tap your location, see the public record</p>
+    </header>
+
+    <div class="map-wrap">
+        <div id="map" role="application" aria-label="Map. Tap to drop a pin."></div>
+        <div id="mapHint" class="map-hint hidden"></div>
+    </div>
+
+    <div id="locBadge" class="badge">Tap the map or use your GPS location</div>
+
+    <button id="gpsBtn" class="btn-primary">🎯 Use My GPS Location</button>
+
+    <form id="idForm" class="row" autocomplete="off">
+        <input id="idInput" type="text" inputmode="text" placeholder="Search by Parcel ID" aria-label="Parcel ID">
+        <button class="btn-secondary" type="submit">Go</button>
+    </form>
+
+    <div id="status" role="status" aria-live="polite"></div>
+
+    <section id="card" class="card hidden" aria-live="polite"></section>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+'use strict';
+
+// ---- Config -------------------------------------------------------------
+// WI Statewide Parcels (V12, 2026) hosted FeatureServer. Field names verified
+// against the live layer schema.
+const PARCEL_SVC = 'https://services3.arcgis.com/n6uYoouQZW75n5WI/arcgis/rest/services/Wisconsin_Statewide_Parcels_DB/FeatureServer/0/query';
+const PENDING = 'Data Pending County Update';
+const OVERLAY_MIN_ZOOM = 15;     // parcel lines are only drawn this close in
+const MAX_GPS_RADIUS_M = 150;    // cap for the "nearby parcels" check
+const DEFAULT_VIEW = [44.9591, -89.6301];
+
+// Fields sent to the AI summary endpoint (must match api/evaluate.js).
+const FACT_FIELDS = ['PARCELID', 'TAXPARCELID', 'STATEID', 'CONAME', 'PLACENAME', 'OWNERNME1', 'OWNERNME2',
+    'PSTLADRESS', 'SITEADRESS', 'SCHOOLDIST', 'TAXROLLYEAR', 'PARCELDATE', 'LOADDATE', 'PARCELSRC',
+    'PROPCLASS', 'AUXCLASS', 'GISACRES', 'DEEDACRES', 'ASSDACRES', 'LNDVALUE', 'IMPVALUE',
+    'CNTASSDVALUE', 'MFLVALUE', 'ESTFMKVALUE', 'NETPRPTA'];
+
+// Wis. Stat. 70.32(2)(a) general property classes, and exempt auxiliary classes.
+const PROP_CLASS = { '1': 'Residential', '2': 'Commercial', '3': 'Manufacturing', '4': 'Agricultural',
+    '5': 'Undeveloped', '5M': 'Agricultural forest', '6': 'Productive forest land', '7': 'Other' };
+const AUX_CLASS = { 'X1': 'Exempt – Federal', 'X2': 'Exempt – State', 'X3': 'Exempt – County', 'X4': 'Exempt – Other' };
+
+// ---- DOM / map setup ----------------------------------------------------
+const $ = (id) => document.getElementById(id);
+const statusEl = $('status'), badge = $('locBadge'), card = $('card'), gpsBtn = $('gpsBtn'), mapHint = $('mapHint');
+
+const map = L.map('map').setView(DEFAULT_VIEW, 13);
+const streets = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    { maxZoom: 19, attribution: '© OpenStreetMap contributors' });
+const aerial = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { maxZoom: 19, attribution: 'Imagery © Esri' });
+streets.addTo(map);
+L.control.layers({ 'Streets': streets, 'Aerial': aerial }, null, { position: 'topright' }).addTo(map);
+
+const parcelLines = L.geoJSON(null, { interactive: false,
+    style: { color: '#E2B13C', weight: 1, opacity: 0.85, fill: false } }).addTo(map);
+const selectedParcel = L.geoJSON(null, { interactive: false,
+    style: { color: '#38BDF8', weight: 3, fillColor: '#38BDF8', fillOpacity: 0.15 } }).addTo(map);
+let marker = null, accuracyCircle = null;
+
+// ---- Helpers ------------------------------------------------------------
+function setStatus(msg, isError = false) {
+    statusEl.textContent = msg;
+    statusEl.classList.toggle('err', isError);
+}
+function setHint(msg) {
+    mapHint.textContent = msg;
+    mapHint.classList.toggle('hidden', !msg);
+}
+function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text !== undefined && text !== null) e.textContent = text;
+    return e;
+}
+const isBlank = (v) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
+const num = (v) => (isBlank(v) || !Number.isFinite(Number(v))) ? null : Number(v);
+const money = (v) => num(v) === null ? null : '$' + Math.round(num(v)).toLocaleString('en-US');
+const money2 = (v) => num(v) === null ? null
+    : '$' + num(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const acres = (v) => num(v) === null ? null
+    : num(v).toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' ac';
+function dateText(v) {
+    if (isBlank(v)) return null;
+    if (typeof v === 'number' && v > 1e11) return new Date(v).toISOString().slice(0, 10);  // epoch ms
+    return String(v);
+}
+function classText(v, table) {
+    if (isBlank(v)) return null;
+    return String(v).split(/[,;]/).map(s => s.trim()).filter(Boolean).map(code => {
+        const label = table[code.toUpperCase()];
+        if (label) return `${code} (${label})`;
+        if (table === AUX_CLASS && /^W\d/i.test(code)) return `${code} (Forest Crop / Managed Forest Law)`;
+        return code;
+    }).join(', ');
+}
+function auxCodes(p) {
+    return isBlank(p.AUXCLASS) ? [] : String(p.AUXCLASS).split(/[,;]/).map(s => s.trim().toUpperCase());
+}
+// Geodesic polygon area (same method as turf.js), in acres.
+function geometryAcres(g) {
+    if (!g) return null;
+    const R = 6371008.8, rad = (d) => d * Math.PI / 180;
+    const ringArea = (r) => {
+        let a = 0;
+        for (let i = 0; i < r.length; i++) {
+            const p1 = r[i], p2 = r[(i + 1) % r.length], p3 = r[(i + 2) % r.length];
+            a += (rad(p3[0]) - rad(p1[0])) * Math.sin(rad(p2[1]));
+        }
+        return Math.abs(a * R * R / 2);
+    };
+    const polys = g.type === 'Polygon' ? [g.coordinates] : g.type === 'MultiPolygon' ? g.coordinates : [];
+    if (!polys.length) return null;
+    const m2 = polys.reduce((sum, [outer, ...holes]) => sum + ringArea(outer) - holes.reduce((h, r) => h + ringArea(r), 0), 0);
+    return m2 / 4046.8564224;
+}
+
+function metersToDegrees(lat, meters) {
+    return { dLat: meters / 111320, dLng: meters / (111320 * Math.cos(lat * Math.PI / 180)) };
+}
+function uniqueFeatures(features) {
+    const seen = new Set();
+    return features.filter(f => {
+        const key = f.id ?? f.properties?.OBJECTID ?? JSON.stringify(f.properties);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+    });
+}
+
+// Query the parcel layer. Throws on ANY service error so a failed query can
+// never be mistaken for "no parcel here".
+async function queryParcels(params, signal) {
+    const url = PARCEL_SVC + '?' + new URLSearchParams({ f: 'geojson', ...params });
+    const res = await fetch(url, { signal });
+    if (!res.ok) throw new Error(`Parcel service returned HTTP ${res.status}.`);
+    const data = await res.json();
+    if (data.error) {
+        const detail = (data.error.details || []).join(' ');
+        throw new Error(`Parcel service error ${data.error.code}: ${data.error.message}${detail ? ' (' + detail + ')' : ''}`);
+    }
+    if (!Array.isArray(data.features)) throw new Error('Parcel service returned an unexpected response.');
+    return data;
+}
+
+// ---- Parcel line overlay (replaces the non-existent WMS) ---------------
+let overlayCtl = null, overlayTimer = null;
+function refreshOverlay() {
+    clearTimeout(overlayTimer);
+    overlayTimer = setTimeout(async () => {
+        if (overlayCtl) overlayCtl.abort();
+        if (map.getZoom() < OVERLAY_MIN_ZOOM) {
+            parcelLines.clearLayers();
+            setHint('Zoom in to show parcel lines');
+            return;
+        }
+        overlayCtl = new AbortController();
+        const b = map.getBounds();
+        try {
+            const data = await queryParcels({
+                geometry: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].map(n => n.toFixed(6)).join(','),
+                geometryType: 'esriGeometryEnvelope', inSR: '4326', outSR: '4326',
+                spatialRel: 'esriSpatialRelIntersects', outFields: 'OBJECTID', returnGeometry: 'true',
+                maxAllowableOffset: '0.00001', geometryPrecision: '6', resultRecordCount: '2000'
+            }, overlayCtl.signal);
+            parcelLines.clearLayers();
+            parcelLines.addData(data);
+            const capped = data.exceededTransferLimit || (data.properties && data.properties.exceededTransferLimit);
+            setHint(capped ? 'Some parcel lines omitted. Zoom in further.' : '');
+        } catch (e) {
+            if (e.name === 'AbortError') return;
+            setHint('Parcel lines unavailable: ' + e.message);
+        }
+    }, 350);
+}
+map.on('moveend', refreshOverlay);
+refreshOverlay();
+
+// ---- Location lookup ----------------------------------------------------
+let lookupCtl = null, lookupSeq = 0;
+
+function placeMarker(lat, lng, accuracy) {
+    if (!marker) {
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+        marker.on('dragend', () => { const p = marker.getLatLng(); lookupPoint(p.lat, p.lng, null); });
+    } else {
+        marker.setLatLng([lat, lng]);
+    }
+    if (accuracyCircle) { map.removeLayer(accuracyCircle); accuracyCircle = null; }
+    if (accuracy) {
+        accuracyCircle = L.circle([lat, lng], { radius: accuracy, color: '#94A3B8', weight: 1,
+            fillOpacity: 0.08, interactive: false }).addTo(map);
+    }
+}
+
+// Start a lookup; returns a token used to discard stale responses.
+function beginLookup() {
+    if (lookupCtl) lookupCtl.abort();
+    lookupCtl = new AbortController();
+    return { seq: ++lookupSeq, signal: lookupCtl.signal };
+}
+const isStale = (t) => t.seq !== lookupSeq;
+
+async function lookupPoint(lat, lng, accuracy) {
+    const t = beginLookup();
+    placeMarker(lat, lng, accuracy);
+    badge.textContent = `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}` +
+        (accuracy ? ` · GPS ±${Math.round(accuracy)} m` : ' · dropped pin');
+    selectedParcel.clearLayers();
+    hideCard();
+    setStatus('Querying statewide parcel record…');
+
+    const base = { inSR: '4326', outSR: '4326', spatialRel: 'esriSpatialRelIntersects',
+        outFields: '*', returnGeometry: 'true' };
+    const radius = accuracy ? Math.min(Math.max(accuracy, 5), MAX_GPS_RADIUS_M) : 0;
+
+    try {
+        const pointQuery = queryParcels({ ...base, geometryType: 'esriGeometryPoint',
+            geometry: `${lng.toFixed(7)},${lat.toFixed(7)}` }, t.signal);
+        let nearQuery = Promise.resolve(null);
+        if (radius) {
+            const { dLat, dLng } = metersToDegrees(lat, radius);
+            nearQuery = queryParcels({ ...base, geometryType: 'esriGeometryEnvelope', resultRecordCount: '25',
+                geometry: [lng - dLng, lat - dLat, lng + dLng, lat + dLat].map(n => n.toFixed(7)).join(',') }, t.signal);
+        }
+        const [hit, near] = await Promise.all([pointQuery, nearQuery]);
+        if (isStale(t)) return;
+
+        const hits = uniqueFeatures(hit.features);
+        const nearby = near ? uniqueFeatures(near.features) : [];
+
+        if (hits.length === 1) {
+            const others = nearby.filter(f => (f.id ?? f.properties.OBJECTID) !== (hits[0].id ?? hits[0].properties.OBJECTID));
+            showParcel(hits[0], { accuracy, others });
+        } else if (hits.length > 1) {
+            showPicker(hits, `${hits.length} parcel records overlap this exact point (stacked or duplicate polygons). Choose one:`);
+        } else if (nearby.length) {
+            showPicker(nearby, `This point is not inside any parcel polygon, but ${nearby.length} parcel(s) fall within the GPS error (±${Math.round(radius)} m). Choose one, or move the pin:`);
+        } else {
+            showNoParcel(lat, lng);
+        }
+    } catch (e) {
+        if (e.name === 'AbortError' || isStale(t)) return;
+        showError(e.message);
+    }
+}
+
+async function lookupParcelId(raw) {
+    const id = raw.trim();
+    if (!/^[A-Za-z0-9 .\-_\/]{3,40}$/.test(id)) {
+        setStatus('Parcel IDs may contain only letters, digits, spaces and . - _ /', true);
+        return;
+    }
+    const t = beginLookup();
+    hideCard();
+    setStatus(`Searching statewide records for ${id}…`);
+    try {
+        const data = await queryParcels({
+            where: `PARCELID='${id}' OR TAXPARCELID='${id}' OR STATEID='${id}'`,
+            outFields: '*', returnGeometry: 'true', outSR: '4326', resultRecordCount: '20'
+        }, t.signal);
+        if (isStale(t)) return;
+        const hits = uniqueFeatures(data.features);
+        if (hits.length === 1) showParcel(hits[0], { zoom: true });
+        else if (hits.length > 1) showPicker(hits, `${hits.length} records match "${id}" (the same ID can exist in more than one county). Choose one:`);
+        else {
+            setStatus('No match.');
+            renderNotice('No matching parcel', `No parcel in the statewide layer has PARCELID, TAXPARCELID or STATEID equal to "${id}". Nothing was substituted. Check the ID format your county uses, or locate the parcel on the map.`);
+        }
+    } catch (e) {
+        if (e.name === 'AbortError' || isStale(t)) return;
+        showError(e.message);
+    }
+}
+
+// ---- Card rendering ------------------------------------------------------
+function hideCard() { card.classList.add('hidden'); card.replaceChildren(); }
+function openCard() { card.replaceChildren(); card.classList.remove('hidden'); return card; }
+
+function fact(dl, label, value, missing = PENDING) {
+    dl.append(el('dt', null, label));
+    const dd = el('dd');
+    if (isBlank(value)) { dd.textContent = missing; dd.className = 'pending'; }
+    else dd.textContent = value;
+    dl.append(dd);
+}
+function section(parent, title) {
+    parent.append(el('div', 'section', title));
+    const dl = el('dl');
+    parent.append(dl);
+    return dl;
+}
+function pickLabel(p) {
+    const b = el('button', 'pick');
+    b.type = 'button';
+    b.append(document.createTextNode(p.PARCELID || '(no PARCELID)'));
+    b.append(el('small', null, [p.CONAME && `${p.CONAME} County`, p.OWNERNME1, p.SITEADRESS].filter(Boolean).join(' · ') || 'No owner or address on record'));
+    return b;
+}
+
+function showPicker(features, message) {
+    setStatus('Multiple candidate parcels. Confirm which one.');
+    const c = openCard();
+    c.append(el('div', 'card-kicker', 'Confirm parcel'));
+    c.append(el('div', 'banner warn', message));
+    for (const f of features) {
+        const b = pickLabel(f.properties);
+        b.addEventListener('click', () => showParcel(f, { zoom: true }));
+        c.append(b);
+    }
+    selectedParcel.clearLayers();
+    selectedParcel.addData({ type: 'FeatureCollection', features: features.filter(f => f.geometry) });
+}
+
+function showParcel(feature, { accuracy = null, others = [], zoom = false } = {}) {
+    const p = feature.properties;
+    selectedParcel.clearLayers();
+    if (feature.geometry) {
+        selectedParcel.addData(feature);
+        if (zoom) map.fitBounds(selectedParcel.getBounds(), { maxZoom: 17, padding: [20, 20] });
+    }
+    setStatus(`Parcel ${p.PARCELID || '(no ID)'} from ${p.CONAME || 'unknown'} County record.`);
+
+    const c = openCard();
+    c.append(el('div', 'card-kicker', 'Property Intelligence Card'));
+    c.append(el('div', 'card-title', p.PARCELID || 'No PARCELID on record'));
+    c.append(el('div', 'card-sub', [p.CONAME ? `${p.CONAME} County` : 'County not on record', p.PLACENAME].filter(Boolean).join(' · ')));
+
+    // Location confidence
+    if (accuracy && accuracy > MAX_GPS_RADIUS_M) {
+        c.append(el('div', 'banner warn', `GPS fix is coarse (±${Math.round(accuracy)} m). This parcel may not be where you are standing. Wait for a better fix or drop a pin.`));
+    }
+    if (others.length) {
+        const box = el('div', 'banner warn', `GPS error (±${Math.round(accuracy)} m) also reaches ${others.length} neighboring parcel(s). Confirm the blue outline matches your position, or switch:`);
+        for (const f of others) {
+            const b = pickLabel(f.properties);
+            b.addEventListener('click', () => showParcel(f, { zoom: true }));
+            box.append(b);
+        }
+        c.append(box);
+    }
+    const aux = auxCodes(p);
+    if (aux.some(a => ['X1', 'X2', 'X3'].includes(a))) {
+        c.append(el('div', 'banner info', `Public ownership: auxiliary class ${p.AUXCLASS} (${aux.filter(a => AUX_CLASS[a]).map(a => AUX_CLASS[a]).join(', ')}). Tax-exempt, so assessed values are typically blank or zero.`));
+    }
+
+    // Lead signals, MFL and soils, fetched server-side from public sources.
+    const intel = el('div');
+    c.append(intel);
+    loadIntel(feature, intel);
+
+    let dl = section(c, 'Ownership');
+    fact(dl, 'Owner of record', p.OWNERNME1);
+    if (!isBlank(p.OWNERNME2)) fact(dl, 'Second owner', p.OWNERNME2);
+    fact(dl, 'Mailing address', p.PSTLADRESS);
+
+    dl = section(c, 'Location');
+    fact(dl, 'Site address', p.SITEADRESS, 'None on record (common for woodland)');
+    fact(dl, 'Municipality', p.PLACENAME);
+    fact(dl, 'School district', p.SCHOOLDIST);
+    if (!isBlank(p.TAXPARCELID) && p.TAXPARCELID !== p.PARCELID) fact(dl, 'Tax parcel ID', p.TAXPARCELID);
+    fact(dl, 'State ID', p.STATEID);
+
+    dl = section(c, 'Land');
+    fact(dl, 'GIS acres', acres(p.GISACRES));
+    const calcAcres = geometryAcres(feature.geometry);
+    if (calcAcres !== null) fact(dl, 'Boundary acres (calculated)', acres(calcAcres));
+    fact(dl, 'Deed acres', acres(p.DEEDACRES));
+    fact(dl, 'Assessed acres', acres(p.ASSDACRES));
+    fact(dl, 'Property class', classText(p.PROPCLASS, PROP_CLASS));
+    fact(dl, 'Auxiliary class', classText(p.AUXCLASS, AUX_CLASS), 'None');
+
+    dl = section(c, `Assessment${isBlank(p.TAXROLLYEAR) ? '' : ' · ' + p.TAXROLLYEAR + ' tax roll'}`);
+    fact(dl, 'Land value', money(p.LNDVALUE));
+    fact(dl, 'Improvement value', money(p.IMPVALUE));
+    fact(dl, 'Total assessed', money(p.CNTASSDVALUE));
+    if (!isBlank(p.MFLVALUE) || aux.some(a => a.startsWith('W'))) fact(dl, 'MFL value', money(p.MFLVALUE));
+    fact(dl, 'Est. fair market value (assessor)', money(p.ESTFMKVALUE));
+    fact(dl, 'Net property tax', money2(p.NETPRPTA));
+
+    dl = section(c, 'Not available from public records');
+    fact(dl, 'Standing timber volume', null, 'Not in public records. Requires field cruise.');
+
+    dl = section(c, 'Provenance');
+    fact(dl, 'Parcel record date', dateText(p.PARCELDATE));
+    fact(dl, 'Statewide load date', dateText(p.LOADDATE));
+    fact(dl, 'Source', p.PARCELSRC);
+    c.append(el('div', 'fine', 'Source: Wisconsin Statewide Parcel Database (V12, 2026). Values shown exactly as submitted by the county.'));
+
+
+}
+
+function renderNotice(title, message, kind = 'info') {
+    const c = openCard();
+    c.append(el('div', 'card-kicker', 'Property Intelligence Card'));
+    c.append(el('div', 'card-title', title));
+    c.append(el('div', `banner ${kind}`, message));
+}
+
+function showNoParcel(lat, lng) {
+    setStatus('No parcel polygon at this point.');
+    renderNotice('No parcel at this point',
+        `No tax parcel polygon in the statewide layer contains ${lat.toFixed(5)}, ${lng.toFixed(5)}. This is usually road or railroad right-of-way, open water, or an area missing from the county's submission. Nothing was substituted. Switch to Aerial or zoom in to see the nearest parcel lines.`);
+}
+
+function showError(message) {
+    setStatus('Lookup failed. No data shown.', true);
+    renderNotice('Lookup failed', `The parcel query did not complete, so no parcel information is shown. ${message}`, 'err');
+}
+
+// ---- Parcel intelligence (Phase 1: ownership, MFL, soils) ----------------
+let intelSeq = 0;
+
+async function loadIntel(feature, box) {
+    const seq = ++intelSeq;
+    box.replaceChildren(el('div', 'loading', 'Checking ownership, MFL enrollment and soils…'));
+    const objectId = feature.id ?? feature.properties.OBJECTID;
+    try {
+        const out = await window.localEvaluate({ objectId, parcelId: feature.properties.PARCELID || null });
+        const data = out.data || {};
+        if (seq !== intelSeq) return;
+        if (out.code !== 200) throw new Error(data.error || `Lookup returned status ${out.code}.`);
+        box.replaceChildren();
+        renderLead(box, data.lead, data.ownership);
+        renderMfl(box, data.mfl);
+        renderComps(box, data.comps);
+        renderSoils(box, data.soils);
+        renderSources(box, data.sources);
+    } catch (e) {
+        if (seq !== intelSeq) return;
+        box.replaceChildren(el('div', 'banner err', `Ownership / MFL / soils lookup failed. Nothing is shown for these sections. ${e.message}`));
+    }
+}
+
+function signal(parent, met, label, detail) {
+    const row = el('div', 'sig');
+    const [icon, cls] = met === true ? ['✓', 'sig-yes'] : met === false ? ['✗', 'sig-no'] : ['?', 'sig-unk'];
+    row.append(el('div', `sig-icon ${cls}`, icon), el('div', null, label));
+    if (detail) row.append(el('div', 'sig-detail', detail));
+    parent.append(row);
+}
+
+function renderLead(box, lead, ownership) {
+    box.append(el('div', 'section', 'Acquisition lead signals'));
+    for (const c of lead.criteria) signal(box, c.met, c.label, c.detail);
+    if (lead.allCriteriaMet) box.append(el('div', 'banner info', 'Meets all three lead criteria.'));
+    for (const x of lead.expiringEnrollments) {
+        box.append(el('div', 'banner warn', `MFL order ${x.orderNo} expires ${x.expires} (${x.yearsRemaining} yr${x.yearsRemaining === 1 ? '' : 's'}). Expiring enrollments are acquisition opportunities.`));
+    }
+    if (ownership && ownership.reasons && ownership.reasons.length) {
+        box.append(el('div', 'fine', `Owner status: ${ownership.reasons.join(' ')}`));
+    }
+    box.append(el('div', 'fine', lead.note));
+}
+
+function orderItem(o, matched) {
+    const item = el('div', 'item');
+    item.append(el('div', 'item-title', `${o.program || 'Tax law'} order ${o.orderNo || '(no number)'}`));
+    const acres = o.orderAcres || {};
+    const parts = [
+        o.entryYear && `Entered ${o.entryYear}`,
+        o.expires && `Expires ${o.expires}${o.yearsRemaining !== null ? ` (${o.yearsRemaining} yr left)` : ''}`,
+        acres.total !== null && acres.total !== undefined && `Order: ${acres.total} ac (${acres.open ?? 0} open / ${acres.closed ?? 0} closed)`,
+        o.ownerType && `Owner type: ${o.ownerType}`,
+        matched ? `Matched by ${o.match}` : `≈${o.nearestMeters} m from parcel, not confirmed`
+    ].filter(Boolean);
+    item.append(el('div', 'item-meta', parts.join(' · ')));
+    const tracts = o.tracts.filter(t => matched ? t.match : true).slice(0, 4);
+    for (const t of tracts) {
+        item.append(el('div', 'item-meta', `• ${t.description || 'Tract'}${t.acres !== null ? ` · ${t.acres} ac` : ''}${t.access ? ` · ${t.access}` : ''}${t.countyParcelNo ? ` · county parcel ${t.countyParcelNo}` : ''}`));
+    }
+    return item;
+}
+
+function renderMfl(box, mfl) {
+    box.append(el('div', 'section', 'Managed Forest Law / Forest Crop'));
+    if (!mfl.ok) { box.append(el('div', 'banner err', `Enrollment check failed: ${mfl.error}`)); return; }
+    if (mfl.status === 'enrolled') {
+        for (const o of mfl.matched) box.append(orderItem(o, true));
+    } else {
+        box.append(el('div', null, 'No MFL or Forest Crop enrollment matched this parcel.'));
+    }
+    if (mfl.nearby.length) {
+        const d = el('details');
+        d.append(el('summary', null, `${mfl.nearby.length} other enrollment(s) within ${mfl.searchRadiusMeters} m (not confirmed for this parcel)`));
+        for (const o of mfl.nearby) d.append(orderItem(o, false));
+        box.append(d);
+    }
+    if (mfl.truncated) box.append(el('div', 'banner warn', 'The DNR service returned only part of the nearby enrollments.'));
+    box.append(el('div', 'fine', mfl.method));
+}
+
+const usd = (v) => '$' + Math.round(v).toLocaleString('en-US');
+
+function renderComps(box, comps) {
+    box.append(el('div', 'section', 'Comparable land sales'));
+    if (!comps || !comps.ok) { box.append(el('div', 'banner err', `Comparable sales lookup failed: ${comps ? comps.error : 'no response'}`)); return; }
+    const cov = comps.coverage && comps.coverage.from ? `Sales data loaded: ${comps.coverage.from} to ${comps.coverage.to}.` : '';
+    if (comps.status !== 'ok') { box.append(el('div', 'pending', `${comps.note} ${cov}`)); return; }
+
+    const ppa = comps.pricePerAcre;
+    const dl = el('dl');
+    dl.append(el('dt', null, 'Median price / acre'), el('dd', null, usd(ppa.median)));
+    if (ppa.p25 !== null) dl.append(el('dt', null, 'Middle half'), el('dd', null, `${usd(ppa.p25)} – ${usd(ppa.p75)} / ac`));
+    dl.append(el('dt', null, 'Full range'), el('dd', null, `${usd(ppa.min)} – ${usd(ppa.max)} / ac`));
+    dl.append(el('dt', null, 'Based on'), el('dd', null, `${comps.count} sale${comps.count === 1 ? '' : 's'} within ${comps.radiusMiles} mi${comps.sizeMatched ? ', similar size' : ''}`));
+    box.append(dl);
+    if (comps.count < 5) box.append(el('div', 'banner warn', `Only ${comps.count} comparable sale(s) found. Treat this as thin evidence.`));
+
+    const d = el('details');
+    d.append(el('summary', null, `Show the ${comps.count} sale${comps.count === 1 ? '' : 's'}`));
+    for (const c of comps.comps) {
+        const item = el('div', 'item');
+        item.append(el('div', 'item-title', `${usd(c.pricePerAcre)}/ac · ${c.acres} ac · ${usd(c.price)}`));
+        item.append(el('div', 'item-meta', [c.date, c.municipality, `${c.county} Co.`, `${c.distanceMiles} mi`].filter(Boolean).join(' · ')));
+        item.append(el('div', 'item-meta', [c.use, c.mflAcres ? `${c.mflAcres} ac MFL` : null, c.waterFt ? `${c.waterFt} ft water frontage` : null, c.plss, c.parcel && `parcel ${c.parcel}`].filter(Boolean).join(' · ')));
+        d.append(item);
+    }
+    box.append(d);
+    box.append(el('div', 'fine', `Arm's-length, land-only sales of forest or undeveloped land from WI DOR transfer returns. ${comps.method} ${cov} Market evidence, not an appraisal.`));
+}
+
+function renderSoils(box, soils) {
+    box.append(el('div', 'section', 'Soils & site productivity'));
+    if (!soils.ok) { box.append(el('div', 'banner err', `Soils lookup failed: ${soils.error}`)); return; }
+    if (soils.note) box.append(el('div', soils.status === 'none' ? null : 'banner warn', soils.note));
+    if (!soils.units.length) return;
+
+    if (soils.productivity.length) {
+        const dl = el('dl');
+        for (const s of soils.productivity.slice(0, 6)) {
+            dl.append(el('dt', null, s.species || s.symbol || 'Unknown species'));
+            dl.append(el('dd', null, `Site index ${s.siteIndex} · ${s.ratedAcres} ac rated${s.productivityFt3AcYr !== null ? ` · ${s.productivityFt3AcYr} ft³/ac/yr` : ''}`));
+        }
+        box.append(dl);
+        box.append(el('div', 'fine', 'Area-weighted across the soil components rated for each species (SSURGO site index, base age per the listed method).'));
+    } else {
+        box.append(el('div', 'pending', 'No forest productivity ratings published for these soils.'));
+    }
+
+    const d = el('details');
+    d.append(el('summary', null, `${soils.units.length} soil map unit(s)${soils.totalAcres ? ` · ${soils.totalAcres} ac total` : ''}`));
+    for (const u of soils.units) {
+        const item = el('div', 'item');
+        item.append(el('div', 'item-title', `${u.symbol ? u.symbol + ' · ' : ''}${u.name || 'Unnamed map unit'}`));
+        item.append(el('div', 'item-meta', [
+            u.acres !== null && `${u.acres} ac${u.percentOfParcel !== null ? ` (${u.percentOfParcel}%)` : ''}`,
+            u.drainage && `Drainage: ${u.drainage}`
+        ].filter(Boolean).join(' · ') || 'Area not available'));
+        const majors = u.components.filter(c => c.major);
+        for (const c of majors) {
+            const si = c.siteIndex.map(s => `${s.species || s.symbol} SI ${s.siteIndex}`).join(', ');
+            item.append(el('div', 'item-meta', `• ${c.name}${c.percent !== null ? ` ${c.percent}%` : ''}${si ? ': ' + si : ''}`));
+        }
+        d.append(item);
+    }
+    box.append(d);
+}
+
+function renderSources(box, sources) {
+    if (!sources || !sources.length) return;
+    const f = el('div', 'fine', 'Sources: ');
+    sources.forEach((s, i) => {
+        const a = el('a', null, s.name);
+        a.href = s.url; a.target = '_blank'; a.rel = 'noopener';
+        f.append(a);
+        if (i < sources.length - 1) f.append(document.createTextNode(' · '));
+    });
+    box.append(f);
+}
+
+// ---- AI summary ----------------------------------------------------------
+async function runSummary(p, btn, out) {
+    btn.disabled = true;
+    btn.textContent = 'Generating…';
+    out.replaceChildren();
+    const parcel = {};
+    for (const k of FACT_FIELDS) parcel[k] = k === 'LOADDATE' ? dateText(p[k]) : (p[k] ?? null);
+    try {
+        const res = await fetch('/api/summary', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parcel }) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.summary) throw new Error(data.error || `Server returned HTTP ${res.status}.`);
+        out.append(el('div', 'section', 'AI field summary'), el('div', 'ai', data.summary),
+            el('div', 'fine', 'Generated only from the record above. Any figure not found in that record is rejected by the server.'));
+        btn.remove();
+    } catch (e) {
+        out.append(el('div', 'banner err', e.message));
+        btn.disabled = false;
+        btn.textContent = 'Retry AI field summary';
+    }
+}
+
+// ---- Inputs -------------------------------------------------------------
+map.on('click', (e) => lookupPoint(e.latlng.lat, e.latlng.lng, null));
+
+gpsBtn.addEventListener('click', () => {
+    if (!('geolocation' in navigator)) { setStatus('This browser does not provide GPS location.', true); return; }
+    if (!window.isSecureContext) { setStatus('GPS requires the app to be opened over HTTPS.', true); return; }
+    gpsBtn.disabled = true;
+    setStatus('Acquiring GPS fix…');
+    navigator.geolocation.getCurrentPosition((pos) => {
+        gpsBtn.disabled = false;
+        const { latitude, longitude, accuracy } = pos.coords;
+        map.setView([latitude, longitude], Math.max(map.getZoom(), 17));
+        lookupPoint(latitude, longitude, accuracy);
+    }, (err) => {
+        gpsBtn.disabled = false;
+        const messages = {
+            1: 'Location permission denied. Allow location for this site in your browser settings.',
+            2: 'Position unavailable. Move toward open sky, or tap the map to drop a pin.',
+            3: 'GPS timed out after 20 seconds. Try again, or tap the map to drop a pin.'
+        };
+        setStatus(messages[err.code] || err.message, true);
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+});
+
+$('idForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    lookupParcelId($('idInput').value);
+});
+
+setStatus('Tap "Use My GPS Location", tap the map, or search a Parcel ID.');
+</script>
+</body>
+</html>
